@@ -1,6 +1,7 @@
 package comet
 
 import (
+	"chalurania/api"
 	"chalurania/service/log"
 	"fmt"
 	"net"
@@ -23,14 +24,19 @@ type Server struct {
 
 	// 服务器绑定的端口号
 	Port int
+
+	// 当前 server 由用户自定义绑定的回调 router，即当前连接的实际处理业务
+	Router api.IRouter
 }
 
-func NewServer(name string) *Server {
+// 初始化服务器
+func NewServer(name string) api.IServer {
 	s := &Server{
 		Name: name,
 		netWork: "tcp",
 		IP: "127.0.0.1",
 		Port: 8080,
+		Router: nil,
 	}
 	return s
 }
@@ -57,7 +63,10 @@ func (s *Server) Start() {
 		}
 
 		// 服务器正在监听
-		log.Info.Println("Start server success, listening...")
+		log.Info.Println("Server start success, listening...")
+
+		// TODO 自动生成 Id
+		var cid uint32 = 0
 
 		// 与客户端建立连接
 		for {
@@ -69,25 +78,12 @@ func (s *Server) Start() {
 				continue
 			}
 
-			// 从客户的读取数据协程
-			go func() {
-				// 循环读取
-				for {
-					buf := make([]byte, 1024)
-					n, err := conn.Read(buf)
-					if err != nil {
-						log.Error.Println("Conn read err:", err)
-						// 读取失败继续等待下一次读取
-						continue
-					}
+			// 处理新连接请求
+			currentConn := NewConnection(conn, cid, s.Router)
+			cid ++
 
-					// 简单将数据回写
-					if _, err := conn.Write(buf[:n]); err != nil {
-						log.Error.Println("Conn write err:", err)
-						continue
-					}
-				}
-			}()
+			// 启动当前连接的处理业务
+			go currentConn.Start()
 		}
 	}()
 }
@@ -106,4 +102,10 @@ func (s *Server) Serve() {
 	for {
 		time.Sleep(time.Second)
 	}
+}
+
+// 给当前服务注册路由方法，供客户端连接处理使用
+func (s *Server)AddRouter(router api.IRouter) {
+	s.Router = router
+	log.Info.Println("Add router success")
 }
