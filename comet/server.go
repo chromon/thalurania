@@ -2,6 +2,7 @@ package comet
 
 import (
 	"chalurania/api"
+	"chalurania/service/config"
 	"chalurania/service/log"
 	"fmt"
 	"net"
@@ -30,12 +31,13 @@ type Server struct {
 }
 
 // 初始化服务器
-func NewServer(name string) api.IServer {
+func NewServer() api.IServer {
+
 	s := &Server{
-		Name: name,
+		Name: config.GlobalObj.Name,
 		netWork: "tcp",
-		IP: "127.0.0.1",
-		Port: 8080,
+		IP: config.GlobalObj.Host,
+		Port: config.GlobalObj.Port,
 		Router: nil,
 	}
 	return s

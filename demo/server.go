@@ -38,7 +38,7 @@ func (h *HiRouter) PostHandle(r api.IRequest) {
 
 func main() {
 	// 创建 server
-	s := comet.NewServer("s1")
+	s := comet.NewServer()
 
 	// 添加自定义路由
 	s.AddRouter(&HiRouter{})

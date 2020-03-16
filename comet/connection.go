@@ -2,6 +2,7 @@ package comet
 
 import (
 	"chalurania/api"
+	"chalurania/service/config"
 	"chalurania/service/log"
 	"net"
 )
@@ -22,9 +23,6 @@ type Connection struct {
 	// 连接业务的处理方法 router
 	Router api.IRouter
 }
-
-// 统一处理连接业务的接口
-type HandleFunc func(*net.TCPConn, []byte, int) error
 
 // 创建连接
 func NewConnection(conn *net.TCPConn, connId uint32,
@@ -48,7 +46,7 @@ func (c *Connection) StartReader() {
 
 	// 循环读取数据
 	for {
-		buf := make([]byte, 1024)
+		buf := make([]byte, config.GlobalObj.MaxPacketSize)
 		_, err := c.Conn.Read(buf)
 		if err != nil {
 			log.Error.Println("Conn read buf err:", err)
