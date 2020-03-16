@@ -2,8 +2,9 @@ package comet
 
 import (
 	"chalurania/api"
-	"chalurania/service/config"
 	"chalurania/service/log"
+	"errors"
+	"io"
 	"net"
 )
 
@@ -46,18 +47,52 @@ func (c *Connection) StartReader() {
 
 	// 循环读取数据
 	for {
-		buf := make([]byte, config.GlobalObj.MaxPacketSize)
-		_, err := c.Conn.Read(buf)
+		//buf := make([]byte, config.GlobalObj.MaxPacketSize)
+		//_, err := c.Conn.Read(buf)
+		//if err != nil {
+		//	log.Error.Println("Conn read buf err:", err)
+		//	c.ExitChan <- true
+		//	continue
+		//}
+
+		// 创建数据包
+		dp := NewDataPack()
+
+		// 读取客户端 Message header
+		header := make([]byte, dp.GetHeaderLen())
+		// io.ReadFull 读取正好 len(headerLen) 长度的字节
+		_, err := io.ReadFull(c.GetTCPConnection(), header)
 		if err != nil {
-			log.Error.Println("Conn read buf err:", err)
+			log.Error.Println("IO read message header err:", err)
 			c.ExitChan <- true
 			continue
+		}
+
+		// 拆包，得到 message id 和 data length
+		msg, err := dp.Unpack(header)
+		if err != nil {
+			log.Error.Println("Unpack header err:", err)
+			c.ExitChan <- true
+			continue
+		}
+
+		// 根据 dataLen 读取 data
+		var data []byte
+		if msg.GetDataLen() > 0 {
+			data = make([]byte, msg.GetDataLen())
+			_, err := io.ReadFull(c.GetTCPConnection(), data)
+			if err != nil {
+				log.Error.Println("IO read data err:", err)
+				c.ExitChan <- true
+				continue
+			}
+			msg.SetData(data)
 		}
 
 		// 得到当前客户端请求数据
 		req := Request{
 			conn: c,
-			data: buf,
+			msg: msg,
 		}
 
 		// 从 router 中找到注册绑定 conn 的对应 handle
@@ -117,4 +152,29 @@ func (c *Connection) GetConnId() uint32 {
 // 获取远程客户端地址信息
 func (c *Connection) GetRemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
+}
+
+// 将 Message 数据发送到远程 TCP 客户端
+func (c *Connection) SendMsg(id uint32, data []byte) error {
+	if c.isClosed {
+		return errors.New("connection closed when send message")
+	}
+
+	// 将 data 封包，并发送
+	dp := NewDataPack()
+	msg, err := dp.Pack(NewMessage(id, data))
+	if err != nil {
+		log.Error.Println("Pack messsage id:", id, " err:", err)
+		return err
+	}
+
+	// 发送到客户端
+	_, err = c.Conn.Write(msg)
+	if err != nil {
+		log.Error.Println("Write message id:", id, " to client err:", err)
+		c.ExitChan <- true
+		return err
+	}
+
+	return nil
 }

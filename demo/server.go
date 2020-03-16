@@ -12,27 +12,14 @@ type HiRouter struct {
 	router.Router
 }
 
-func (h *HiRouter) PreHandle(r api.IRequest) {
-	log.Info.Println("Call router preHandler")
-	_, err := r.GetConnection().GetTCPConnection().Write([]byte("Before hi"))
-	if err != nil {
-		log.Error.Println("Call router preHandler err:", err)
-	}
-}
-
 func (h *HiRouter) Handle(r api.IRequest) {
 	log.Info.Println("Call router handler")
-	_, err := r.GetConnection().GetTCPConnection().Write([]byte("HiHiHi"))
-	if err != nil {
-		log.Error.Println("Call router handler err:", err)
-	}
-}
+	log.Info.Println("Receive from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
-func (h *HiRouter) PostHandle(r api.IRequest) {
-	log.Info.Println("Call router postHandler")
-	_, err := r.GetConnection().GetTCPConnection().Write([]byte("After hi"))
+	// 反向客户端发送数据
+	err := r.GetConnection().SendMsg(1, []byte("Hi data pack"))
 	if err != nil {
-		log.Error.Println("Call router postHandler err:", err)
+		log.Error.Println("Send message to client err:", err)
 	}
 }
 

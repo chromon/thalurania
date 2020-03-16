@@ -1,7 +1,9 @@
 package main
 
 import (
+	"chalurania/comet"
 	"chalurania/service/log"
+	"io"
 	"net"
 	"time"
 )
@@ -16,20 +18,42 @@ func main() {
 	}
 
 	for {
-		_, err := conn.Write([]byte("HelloWorld"))
+		// 发送封包消息
+		dp := comet.NewDataPack()
+		msg, _ := dp.Pack(comet.NewMessage(0, []byte("First message to server")))
+		_, err := conn.Write(msg)
 		if err != nil {
-			log.Error.Println("Conn write err:", err)
+			log.Error.Println("Client write message err:", err)
 			return
 		}
 
-		buf := make([]byte, 4096)
-		n, err := conn.Read(buf)
+		// 读取流中的数据包 header 部分
+		header := make([]byte, dp.GetHeaderLen())
+		_, err = io.ReadFull(conn, header)
 		if err != nil {
-			log.Error.Println("Conn Read err:", err)
+			log.Error.Println("Client read header err:", err)
+			break
+		}
+
+		// 拆包
+		receiveMsg, err := dp.Unpack(header)
+		if err != nil {
+			log.Error.Println("Unpack err:", err)
 			return
 		}
 
-		log.Info.Printf("Server feedback: %s, len: %d", buf[:n], n)
+		if receiveMsg.GetDataLen() > 0 {
+			msg := receiveMsg.(*comet.Message)
+			msg.Data = make([]byte, msg.GetDataLen())
+
+			_, err := io.ReadFull(conn, msg.Data)
+			if err != nil {
+				log.Error.Println("Server unpack data err:", err)
+				return
+			}
+			log.Info.Printf("Server feedback message id: %d - %s, len: %d", msg.Id, msg.Data, msg.DataLen)
+		}
+
 		time.Sleep(time.Second)
 	}
 }

@@ -11,7 +11,7 @@ type Request struct {
 	conn api.IConnection
 
 	// 客户端请求的数据
-	data []byte
+	msg api.IMessage
 }
 
 // 获取请求 Id
@@ -26,5 +26,10 @@ func (r *Request) GetConnection() api.IConnection {
 
 // 获取请求消息数据
 func (r *Request) GetData() []byte {
-	return r.data
+	return r.msg.GetData()
+}
+
+// 得到请求的消息 ID
+func (r *Request) GetMsgID() uint32 {
+	return r.msg.GetMsgId()
 }
