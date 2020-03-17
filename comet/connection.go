@@ -21,19 +21,19 @@ type Connection struct {
 	// 通知连接是否退出/停止的 channel
 	ExitChan chan bool
 
-	// 连接业务的处理方法 router
-	Router api.IRouter
+	// 消息管理，id 与对应处理方法
+	MsgHandler api.IMsgHandler
 }
 
 // 创建连接
 func NewConnection(conn *net.TCPConn, connId uint32,
-	router api.IRouter) *Connection {
+	msgHandler api.IMsgHandler) *Connection {
 	c := &Connection{
 		Conn: conn,
 		ConnId: connId,
 		isClosed: false,
 		ExitChan: make(chan bool, 1),
-		Router: router,
+		MsgHandler: msgHandler,
 	}
 	return c
 }
@@ -47,14 +47,6 @@ func (c *Connection) StartReader() {
 
 	// 循环读取数据
 	for {
-		//buf := make([]byte, config.GlobalObj.MaxPacketSize)
-		//_, err := c.Conn.Read(buf)
-		//if err != nil {
-		//	log.Error.Println("Conn read buf err:", err)
-		//	c.ExitChan <- true
-		//	continue
-		//}
-
 		// 创建数据包
 		dp := NewDataPack()
 
@@ -96,12 +88,7 @@ func (c *Connection) StartReader() {
 		}
 
 		// 从 router 中找到注册绑定 conn 的对应 handle
-		go func (r api.IRequest) {
-			// 执行注册的路由方法
-			c.Router.PreHandle(r)
-			c.Router.Handle(r)
-			c.Router.PostHandle(r)
-		}(&req)
+		go c.MsgHandler.DoMsgHandler(&req)
 	}
 
 }

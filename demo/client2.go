@@ -20,7 +20,7 @@ func main() {
 	for {
 		// 发送封包消息
 		dp := comet.NewDataPack()
-		msg, _ := dp.Pack(comet.NewMessage(1, []byte("First message to server")))
+		msg, _ := dp.Pack(comet.NewMessage(2, []byte("First message to server")))
 		_, err := conn.Write(msg)
 		if err != nil {
 			log.Error.Println("Client write message err:", err)
