@@ -26,8 +26,8 @@ type Server struct {
 	// 服务器绑定的端口号
 	Port int
 
-	// 消息管理模块，用来绑定 message id 和对应的处理方法
-	msgHandler api.IMsgHandler
+	// 消息管理模块，用来绑定 request id 和对应的处理方法
+	RouterManager api.IRouterManager
 }
 
 // 初始化服务器
@@ -37,7 +37,7 @@ func NewServer() api.IServer {
 		netWork: "tcp",
 		IP: config.GlobalObj.Host,
 		Port: config.GlobalObj.Port,
-		msgHandler: NewMsgHandler(),
+		RouterManager: NewRouterManager(),
 	}
 	return s
 }
@@ -80,7 +80,7 @@ func (s *Server) Start() {
 			}
 
 			// 处理新连接请求
-			currentConn := NewConnection(conn, cid, s.msgHandler)
+			currentConn := NewConnection(conn, cid, s.RouterManager)
 			cid ++
 
 			// 启动当前连接的处理业务
@@ -107,6 +107,6 @@ func (s *Server) Serve() {
 
 // 给当前服务注册路由方法，供客户端连接处理使用
 func (s *Server)AddRouter(msgId uint32, router api.IRouter) {
-	s.msgHandler.AddRouter(msgId, router)
+	s.RouterManager.AddRouter(msgId, router)
 	log.Info.Println("Add router success")
 }

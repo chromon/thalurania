@@ -22,18 +22,18 @@ type Connection struct {
 	ExitChan chan bool
 
 	// 消息管理，id 与对应处理方法
-	MsgHandler api.IMsgHandler
+	RouterManager api.IRouterManager
 }
 
 // 创建连接
 func NewConnection(conn *net.TCPConn, connId uint32,
-	msgHandler api.IMsgHandler) *Connection {
+	routerManager api.IRouterManager) *Connection {
 	c := &Connection{
 		Conn: conn,
 		ConnId: connId,
 		isClosed: false,
 		ExitChan: make(chan bool, 1),
-		MsgHandler: msgHandler,
+		RouterManager: routerManager,
 	}
 	return c
 }
@@ -88,7 +88,7 @@ func (c *Connection) StartReader() {
 		}
 
 		// 从 router 中找到注册绑定 conn 的对应 handle
-		go c.MsgHandler.DoMsgHandler(&req)
+		go c.RouterManager.ManageRequest(&req)
 	}
 
 }

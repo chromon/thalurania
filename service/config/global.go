@@ -52,7 +52,7 @@ func init() {
 
 // 读取用户配置文件
 func (g *Global) Reload() {
-	data, err := ioutil.ReadFile("conf/config.json")
+	data, err := ioutil.ReadFile("../conf/config.json")
 	if err != nil {
 		log.Error.Println("Read config file err:", err)
 	}
