@@ -1,7 +1,7 @@
 package api
 
 // 消息管理
-type IRouterManager interface {
+type IRequestManager interface {
 	// 以非阻塞式处理消息
 	ManageRequest(IRequest)
 

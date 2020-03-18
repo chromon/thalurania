@@ -29,6 +29,12 @@ type Global struct {
 
 	// 服务器允许的最大连接数
 	MaxConn int
+
+	// 业务工作池的数量
+	WorkerPoolSize uint32
+
+	// 业务工作池对应的任务队列最大任务数
+	MaxWorkerTaskLen uint32
 }
 
 // 全局对象
@@ -44,6 +50,8 @@ func init() {
 		Port: 8080,
 		MaxPacketSize: 4096,
 		MaxConn: 10000,
+		WorkerPoolSize: 10,
+		MaxWorkerTaskLen: 1024,
 	}
 
 	// 从配置文件中重写加载用户自定义配置参数
@@ -52,7 +60,7 @@ func init() {
 
 // 读取用户配置文件
 func (g *Global) Reload() {
-	data, err := ioutil.ReadFile("../conf/config.json")
+	data, err := ioutil.ReadFile("conf/config.json")
 	if err != nil {
 		log.Error.Println("Read config file err:", err)
 	}

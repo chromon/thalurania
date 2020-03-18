@@ -2,6 +2,7 @@ package comet
 
 import (
 	"chalurania/api"
+	"chalurania/service/config"
 	"chalurania/service/log"
 	"errors"
 	"io"
@@ -22,18 +23,22 @@ type Connection struct {
 	ExitChan chan bool
 
 	// 消息管理，id 与对应处理方法
-	RouterManager api.IRouterManager
+	RequestManager api.IRequestManager
+
+	// 消息通信管道，用于读写两个协程之间通信
+	MessageChan chan []byte
 }
 
 // 创建连接
 func NewConnection(conn *net.TCPConn, connId uint32,
-	routerManager api.IRouterManager) *Connection {
+	requestManager api.IRequestManager) *Connection {
 	c := &Connection{
-		Conn: conn,
-		ConnId: connId,
-		isClosed: false,
-		ExitChan: make(chan bool, 1),
-		RouterManager: routerManager,
+		Conn:           conn,
+		ConnId:         connId,
+		isClosed:       false,
+		ExitChan:       make(chan bool, 1),
+		RequestManager: requestManager,
+		MessageChan:    make(chan []byte),
 	}
 	return c
 }
@@ -87,16 +92,43 @@ func (c *Connection) StartReader() {
 			msg: msg,
 		}
 
-		// 从 router 中找到注册绑定 conn 的对应 handle
-		go c.RouterManager.ManageRequest(&req)
+		if config.GlobalObj.WorkerPoolSize > 0 {
+			// 已经启动工作池机制，将消息发送给 worker 处理
+			c.RequestManager.SendRequestToTaskQueue(&req)
+		} else {
+			// 从 router 中找到注册绑定 conn 的对应 handle
+			go c.RequestManager.ManageRequest(&req)
+		}
 	}
+}
 
+// 处理 conn 写入数据协程
+func (c *Connection) StartWriter() {
+	log.Info.Println("Writer goroutine running...")
+	defer log.Info.Println(c.GetRemoteAddr().String(), " conn writer exit")
+
+	for {
+		select {
+		case data := <- c.MessageChan:
+			// 有数据写给客户端
+			if _, err := c.Conn.Write(data); err!= nil {
+				log.Error.Println("Writer write data err:", err)
+				return
+			}
+		case <- c.ExitChan:
+			// conn 已关闭
+			return
+		}
+	}
 }
 
 // 启动连接
 func (c *Connection) Start() {
 	// 连接读取客户端数据并处理数据
 	go c.StartReader()
+
+	// 向客户端写入数据
+	go c.StartWriter()
 
 	for {
 		select {
@@ -156,12 +188,7 @@ func (c *Connection) SendMsg(id uint32, data []byte) error {
 	}
 
 	// 发送到客户端
-	_, err = c.Conn.Write(msg)
-	if err != nil {
-		log.Error.Println("Write message id:", id, " to client err:", err)
-		c.ExitChan <- true
-		return err
-	}
+	c.MessageChan <- msg
 
 	return nil
 }
