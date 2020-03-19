@@ -28,6 +28,15 @@ type Server struct {
 
 	// 消息管理模块，用来绑定 request id 和对应的处理方法
 	RequestManager api.IRequestManager
+
+	// 连接管理器
+	ConnManager api.IConnectionManager
+
+	// Server 连接创建时 Hook 函数
+	OnConnStart func (conn api.IConnection)
+
+	// Server 连接断开时的 Hook 函数
+	OnConnStop func (conn api.IConnection)
 }
 
 // 初始化服务器
@@ -38,6 +47,7 @@ func NewServer() api.IServer {
 		IP:             config.GlobalObj.Host,
 		Port:           config.GlobalObj.Port,
 		RequestManager: NewRouterManager(),
+		ConnManager: NewConnectionManager(),
 	}
 	return s
 }
@@ -83,8 +93,14 @@ func (s *Server) Start() {
 				continue
 			}
 
+			// 设置服务器最大连接，如果超过最大连接，则丢弃当前连接
+			if s.ConnManager.GetConnectionSize() >= config.GlobalObj.MaxConn {
+				conn.Close()
+				continue
+			}
+
 			// 处理新连接请求
-			currentConn := NewConnection(conn, cid, s.RequestManager)
+			currentConn := NewConnection(s, conn, cid, s.RequestManager)
 			cid ++
 
 			// 启动当前连接的处理业务
@@ -96,6 +112,8 @@ func (s *Server) Start() {
 // 停止服务器
 func (s *Server) Stop() {
 	log.Info.Println("Server stop success!")
+	// 清理连接
+	s.ConnManager.ClearConnection()
 }
 
 // 服务器服务方法
@@ -113,4 +131,35 @@ func (s *Server) Serve() {
 func (s *Server)AddRouter(msgId uint32, router api.IRouter) {
 	s.RequestManager.AddRouter(msgId, router)
 	log.Info.Println("Add router success")
+}
+
+// 得到连接管理器
+func (s *Server) GetConnManager() api.IConnectionManager {
+	return s.ConnManager
+}
+
+// 设置 server 的连接创建时调用的 Hook 函数
+func (s *Server) SetOnConnStart(hookFunc func (api.IConnection)) {
+	s.OnConnStart = hookFunc
+}
+
+// 设置 server 的连接断开时调用的 Hook 函数
+func (s *Server) SetOnConnStop(hookFunc func (api.IConnection)) {
+	s.OnConnStop = hookFunc
+}
+
+// 调用连接 OnConnStart Hook 函数
+func (s *Server) CallOnConnStart(conn api.IConnection) {
+	if s.OnConnStart != nil {
+		log.Info.Println("Call on connection start...")
+		s.OnConnStart(conn)
+	}
+}
+
+// 调用连接 OnConnStop Hook 函数
+func (s *Server) CallOnConnStop(conn api.IConnection) {
+	if s.OnConnStop != nil {
+		log.Info.Println("Call on connection stop...")
+		s.OnConnStop(conn)
+	}
 }

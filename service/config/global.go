@@ -5,6 +5,7 @@ import (
 	"chalurania/service/log"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 )
 
 // 服务器全局参数
@@ -35,10 +36,47 @@ type Global struct {
 
 	// 业务工作池对应的任务队列最大任务数
 	MaxWorkerTaskLen uint32
+
+	// SendBufMsg 发送消息的缓冲最大长度
+	MaxMsgChanLen uint32
+
+	// 配置文件路径
+	ConfigFilePath string
 }
 
 // 全局对象
 var GlobalObj *Global
+
+// 判断一个文件是否存在
+func PathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+// 读取用户配置文件
+func (g *Global) Reload() {
+	if exist, _ := PathExists(g.ConfigFilePath); exist == false {
+		log.Error.Println("Config file", g.ConfigFilePath, "isn't exist")
+		return
+	}
+
+	data, err := ioutil.ReadFile(g.ConfigFilePath)
+	if err != nil {
+		log.Error.Println("Read config file err:", err)
+	}
+
+	// 解析 json 数据到对象中
+	err = json.Unmarshal(data, g)
+	if err != nil {
+		log.Error.Println("JSON unmarshal err:", err)
+	}
+}
 
 // 全局对象初始化
 func init() {
@@ -52,19 +90,11 @@ func init() {
 		MaxConn: 10000,
 		WorkerPoolSize: 10,
 		MaxWorkerTaskLen: 1024,
+		MaxMsgChanLen: 1024,
+		ConfigFilePath: "conf/config.json",
 	}
 
 	// 从配置文件中重写加载用户自定义配置参数
 	GlobalObj.Reload()
 }
 
-// 读取用户配置文件
-func (g *Global) Reload() {
-	data, err := ioutil.ReadFile("conf/config.json")
-	if err != nil {
-		log.Error.Println("Read config file err:", err)
-	}
-
-	// 解析 json 数据到对象中
-	err = json.Unmarshal(data, &GlobalObj)
-}

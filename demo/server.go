@@ -38,9 +38,36 @@ func (h *HelloRouter) Handle(r api.IRequest) {
 	}
 }
 
+// 创建连接时执行
+func OnConnectionStart(conn api.IConnection) {
+	log.Info.Println("On connection start called...")
+
+	// 设置属性
+	conn.SetProperty("name", "ellery")
+
+	err := conn.SendMsg(2, []byte("Connect success"))
+	if err != nil {
+		log.Error.Println("On conn start err:", err)
+	}
+}
+
+// 断开连接时执行
+func OnConnectionLost(conn api.IConnection) {
+	log.Info.Println("On connection lost called...")
+
+	// 获取属性
+	if name, err := conn.GetProperty("name"); err == nil {
+		log.Info.Println("Conn property name:", name)
+	}
+}
+
 func main() {
 	// 创建 server
 	s := comet.NewServer()
+
+	// 注册连接回调函数
+	s.SetOnConnStart(OnConnectionStart)
+	s.SetOnConnStop(OnConnectionLost)
 
 	// 添加自定义路由
 	s.AddRouter(1, &HiRouter{})
