@@ -27,7 +27,7 @@ type Server struct {
 	Port int
 
 	// 消息管理模块，用来绑定 request id 和对应的处理方法
-	RequestManager api.IRequestManager
+	RouterManager api.IRouterManager
 
 	// 连接管理器
 	ConnManager api.IConnectionManager
@@ -42,12 +42,12 @@ type Server struct {
 // 初始化服务器
 func NewServer() api.IServer {
 	s := &Server{
-		Name:           config.GlobalObj.Name,
-		netWork:        "tcp",
-		IP:             config.GlobalObj.Host,
-		Port:           config.GlobalObj.Port,
-		RequestManager: NewRouterManager(),
-		ConnManager: NewConnectionManager(),
+		Name:          config.GlobalObj.Name,
+		netWork:       "tcp",
+		IP:            config.GlobalObj.Host,
+		Port:          config.GlobalObj.Port,
+		RouterManager: NewRouterManager(),
+		ConnManager:   NewConnectionManager(),
 	}
 	return s
 }
@@ -60,7 +60,7 @@ func (s *Server) Start() {
 	go func() {
 
 		// 启动 worker 工作池
-		s.RequestManager.StartWorkerPool()
+		s.RouterManager.StartWorkerPool()
 
 		// 获取服务器监听地址
 		addrStr := fmt.Sprintf("%s:%d", s.IP, s.Port)
@@ -100,7 +100,7 @@ func (s *Server) Start() {
 			}
 
 			// 处理新连接请求
-			currentConn := NewConnection(s, conn, cid, s.RequestManager)
+			currentConn := NewConnection(s, conn, cid, s.RouterManager)
 			cid ++
 
 			// 启动当前连接的处理业务
@@ -128,8 +128,8 @@ func (s *Server) Serve() {
 }
 
 // 给当前服务注册路由方法，供客户端连接处理使用
-func (s *Server)AddRouter(msgId uint32, router api.IRouter) {
-	s.RequestManager.AddRouter(msgId, router)
+func (s *Server)AddRouter(requestId uint32, router api.IRouter) {
+	s.RouterManager.AddRouter(requestId, router)
 	log.Info.Println("Add router success")
 }
 

@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-type RequestManager struct {
+type RouterManager struct {
 	// 存放每个 id 对应的处理方法
 	Routers map[uint32] api.IRouter
 
@@ -19,8 +19,8 @@ type RequestManager struct {
 }
 
 // 创建消息管理
-func NewRouterManager() *RequestManager {
-	return &RequestManager{
+func NewRouterManager() *RouterManager {
+	return &RouterManager{
 		Routers: make(map[uint32] api.IRouter),
 		WorkerPoolSize: config.GlobalObj.WorkerPoolSize,
 		// TaskQueue 中的每个队列应该是和一个 Worker 对应，所以数量一致
@@ -29,10 +29,10 @@ func NewRouterManager() *RequestManager {
 }
 
 // 以非阻塞式处理消息
-func (rm *RequestManager) ManageRequest(request api.IRequest) {
-	manager, ok := rm.Routers[request.GetMsgID()]
+func (rm *RouterManager) ManageRequest(request api.IRequest) {
+	manager, ok := rm.Routers[request.GetRequestId()]
 	if !ok {
-		log.Error.Println("Manager request not found message id:", request.GetMsgID())
+		log.Error.Println("Manager request not found request id:", request.GetRequestId())
 		return
 	}
 
@@ -42,20 +42,20 @@ func (rm *RequestManager) ManageRequest(request api.IRequest) {
 	manager.PostHandle(request)
 }
 
-// 为消息添加具体的处理逻辑
-func (rm *RequestManager) AddRouter(msgId uint32, router api.IRouter) {
-	// 判断当前 message 绑定的处理方法是否存在
-	if _, ok := rm.Routers[msgId]; ok {
-		log.Error.Println("Repeated router api, message id:", strconv.Itoa(int(msgId)))
+// 为消息请求添加具体的处理逻辑
+func (rm *RouterManager) AddRouter(requestId uint32, router api.IRouter) {
+	// 判断当前 request 绑定的处理方法是否存在
+	if _, ok := rm.Routers[requestId]; ok {
+		log.Error.Println("Repeated router api, request id:", strconv.Itoa(int(requestId)))
 	}
 
-	// 添加 msgId 与 router api 对应关系
-	rm.Routers[msgId] = router
-	log.Info.Println("Add router api message id:", msgId)
+	// 添加 requestId 与 router api 对应关系
+	rm.Routers[requestId] = router
+	log.Info.Println("Add router api request id:", requestId)
 }
 
 // 启动一个 Worker
-func (rm *RequestManager) StartWorker(workerId int, taskQueue chan api.IRequest) {
+func (rm *RouterManager) StartWorker(workerId int, taskQueue chan api.IRequest) {
 	log.Info.Println("Worker Id:", workerId, " started")
 	// 循环等待队列中的消息
 	for {
@@ -68,7 +68,7 @@ func (rm *RequestManager) StartWorker(workerId int, taskQueue chan api.IRequest)
 }
 
 // 启动 worker 工作池, 每一个 worker 分配一个 TaskQueue
-func (rm *RequestManager) StartWorkerPool() {
+func (rm *RouterManager) StartWorkerPool() {
 	// 遍历需要启动的 worker 数量，并依次启动
 	for i := 0; i < int(rm.WorkerPoolSize); i++ {
 		// 给当前 worker 对应的任务队列开辟空间
@@ -79,7 +79,7 @@ func (rm *RequestManager) StartWorkerPool() {
 }
 
 // 将消息交给 TaskQueue，由 Worker 进行处理
-func (rm *RequestManager) SendRequestToTaskQueue(request api.IRequest) {
+func (rm *RouterManager) SendRequestToTaskQueue(request api.IRequest) {
 	// 根据 Conn Id 来分配当前的连接应该由哪个 Worker 负责处理
 	// 轮询的平均分配法，得到需要处理此连接的 worker Id
 	workerId := request.GetConnection().GetConnId() % rm.WorkerPoolSize

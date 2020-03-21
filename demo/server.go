@@ -17,7 +17,7 @@ func (h *HiRouter) Handle(r api.IRequest) {
 	log.Info.Println("Receive from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	// 反向客户端发送数据
-	err := r.GetConnection().SendMsg(1, []byte("Hi data pack1"))
+	err := r.GetConnection().SendMsg(1, 2, 101, []byte("Hi data pack1"))
 	if err != nil {
 		log.Error.Println("Send message to client err:", err)
 	}
@@ -32,7 +32,7 @@ func (h *HelloRouter) Handle(r api.IRequest) {
 	log.Info.Println("Receive from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	// 反向客户端发送数据
-	err := r.GetConnection().SendMsg(2, []byte("Hello data pack2"))
+	err := r.GetConnection().SendMsg(1, 2, 201, []byte("Hello data pack2"))
 	if err != nil {
 		log.Error.Println("Send message to client err:", err)
 	}
@@ -45,7 +45,7 @@ func OnConnectionStart(conn api.IConnection) {
 	// 设置属性
 	conn.SetProperty("name", "ellery")
 
-	err := conn.SendMsg(2, []byte("Connect success"))
+	err := conn.SendMsg(1, 2, 301, []byte("Connect success"))
 	if err != nil {
 		log.Error.Println("On conn start err:", err)
 	}

@@ -20,7 +20,7 @@ func main() {
 	for {
 		// 发送封包消息
 		dp := comet.NewDataPack()
-		msg, _ := dp.Pack(comet.NewMessage(1, []byte("First message to server2")))
+		msg, _ := dp.Pack(1, 2, comet.NewMessage(202, []byte("First message to server2")))
 		_, err := conn.Write(msg)
 		if err != nil {
 			log.Error.Println("Client write message err:", err)
@@ -36,7 +36,7 @@ func main() {
 		}
 
 		// 拆包
-		receiveMsg, err := dp.Unpack(header)
+		network, operation, receiveMsg, err := dp.Unpack(header)
 		if err != nil {
 			log.Error.Println("Unpack err:", err)
 			return
@@ -51,7 +51,7 @@ func main() {
 				log.Error.Println("Server unpack data err:", err)
 				return
 			}
-			log.Info.Printf("Server feedback message id: %d - %s, len: %d", msg.Id, msg.Data, msg.DataLen)
+			log.Info.Printf("Server feedback message id: %d - %s, len: %d, network: %d, opertion: %d", msg.Id, msg.Data, msg.DataLen, network, operation)
 		}
 
 		time.Sleep(time.Second)

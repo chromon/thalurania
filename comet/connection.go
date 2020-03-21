@@ -27,7 +27,7 @@ type Connection struct {
 	ExitChan chan bool
 
 	// 消息管理，id 与对应处理方法
-	RequestManager api.IRequestManager
+	RouterManager api.IRouterManager
 
 	// 无缓冲消息通信管道，用于读写两个协程之间通信
 	MessageChan chan []byte
@@ -44,17 +44,17 @@ type Connection struct {
 
 // 创建连接
 func NewConnection(server api.IServer, conn *net.TCPConn, connId uint32,
-	requestManager api.IRequestManager) *Connection {
+	requestManager api.IRouterManager) *Connection {
 	c := &Connection{
-		TCPServer: 		server,
+		TCPServer:      server,
 		Conn:           conn,
 		ConnId:         connId,
 		isClosed:       false,
 		ExitChan:       make(chan bool, 1),
-		RequestManager: requestManager,
+		RouterManager:  requestManager,
 		MessageChan:    make(chan []byte),
 		MessageBufChan: make(chan []byte, config.GlobalObj.MaxMsgChanLen),
-		property:		make(map[string]interface{}),
+		property:       make(map[string]interface{}),
 	}
 
 	// 将新建的 conn 连接添加到连接管理器中
@@ -85,8 +85,8 @@ func (c *Connection) StartReader() {
 			break
 		}
 
-		// 拆包，得到 message id 和 data length
-		msg, err := dp.Unpack(header)
+		// 拆包，得到 network, operation, message id 和 data length
+		_, operation, msg, err := dp.Unpack(header)
 		if err != nil {
 			log.Error.Println("Unpack header err:", err)
 			c.ExitChan <- true
@@ -106,18 +106,21 @@ func (c *Connection) StartReader() {
 			msg.SetData(data)
 		}
 
-		// 得到当前客户端请求数据
+		// 得到当前客户端请求数据的协议指令 (对应请求 requestId)
+		var rId = operation
+
 		req := Request{
-			conn: c,
-			msg: msg,
+			requestId: rId,
+			conn:      c,
+			message:   msg,
 		}
 
 		if config.GlobalObj.WorkerPoolSize > 0 {
 			// 已经启动工作池机制，将消息发送给 worker 处理
-			c.RequestManager.SendRequestToTaskQueue(&req)
+			c.RouterManager.SendRequestToTaskQueue(&req)
 		} else {
 			// 从 router 中找到注册绑定 conn 的对应 handle
-			go c.RequestManager.ManageRequest(&req)
+			go c.RouterManager.ManageRequest(&req)
 		}
 	}
 }
@@ -216,41 +219,43 @@ func (c *Connection) GetRemoteAddr() net.Addr {
 }
 
 // 将 Message 数据发送到远程 TCP 客户端
-func (c *Connection) SendMsg(id uint32, data []byte) error {
+func (c *Connection) SendMsg(netWork uint32, operation uint32,
+	id uint32, data []byte) error {
 	if c.isClosed {
 		return errors.New("connection closed when send message")
 	}
 
 	// 将 data 封包，并发送
 	dp := NewDataPack()
-	msg, err := dp.Pack(NewMessage(id, data))
+	dataBuf, err := dp.Pack(netWork, operation, NewMessage(id, data))
 	if err != nil {
 		log.Error.Println("Pack message id:", id, " err:", err)
 		return err
 	}
 
 	// 发送到客户端
-	c.MessageChan <- msg
+	c.MessageChan <- dataBuf
 
 	return nil
 }
 
 // 将 Message 数据发送到远程 TCP 客户端（有缓冲）
-func (c *Connection) SendBufMsg(msgId uint32, data []byte) error {
+func (c *Connection) SendBufMsg(netWork uint32, operation uint32,
+	msgId uint32, data []byte) error {
 	if c.isClosed {
 		return errors.New("connection closed when send message")
 	}
 
 	// 将 data 封包，并发送
 	dp := NewDataPack()
-	msg, err := dp.Pack(NewMessage(msgId, data))
+	dataBuf, err := dp.Pack(netWork, operation, NewMessage(msgId, data))
 	if err != nil {
 		log.Error.Println("Pack message id:", msgId, " err:", err)
 		return err
 	}
 
 	// 发送到客户端
-	c.MessageBufChan <- msg
+	c.MessageBufChan <- dataBuf
 
 	return nil
 }
