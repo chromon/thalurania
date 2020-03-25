@@ -1,4 +1,4 @@
-package comet
+package connection
 
 import (
 	"chalurania/api"

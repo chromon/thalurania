@@ -1,4 +1,4 @@
-package comet
+package packet
 
 // 消息
 type Message struct {

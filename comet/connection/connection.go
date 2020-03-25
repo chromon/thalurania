@@ -1,7 +1,9 @@
-package comet
+package connection
 
 import (
 	"chalurania/api"
+	"chalurania/comet/packet"
+	"chalurania/comet/router"
 	"chalurania/service/config"
 	"chalurania/service/log"
 	"errors"
@@ -73,14 +75,14 @@ func (c *Connection) StartReader() {
 	// 循环读取数据
 	for {
 		// 创建数据包
-		dp := NewDataPack()
+		dp := packet.NewDataPack()
 
 		// 读取客户端 Message header
 		header := make([]byte, dp.GetHeaderLen())
 		// io.ReadFull 读取正好 len(headerLen) 长度的字节
 		_, err := io.ReadFull(c.GetTCPConnection(), header)
 		if err != nil {
-			log.Error.Println("IO read message header err:", err)
+			// log.Error.Println("IO read message header err:", err)
 			c.ExitChan <- true
 			break
 		}
@@ -109,10 +111,10 @@ func (c *Connection) StartReader() {
 		// 得到当前客户端请求数据的协议指令 (对应请求 requestId)
 		var rId = operation
 
-		req := Request{
-			requestId: rId,
-			conn:      c,
-			message:   msg,
+		req := router.Request{
+			RequestId: rId,
+			Conn:      c,
+			Message:   msg,
 		}
 
 		if config.GlobalObj.WorkerPoolSize > 0 {
@@ -226,8 +228,8 @@ func (c *Connection) SendMsg(netWork uint32, operation uint32,
 	}
 
 	// 将 data 封包，并发送
-	dp := NewDataPack()
-	dataBuf, err := dp.Pack(netWork, operation, NewMessage(id, data))
+	dp := packet.NewDataPack()
+	dataBuf, err := dp.Pack(netWork, operation, packet.NewMessage(id, data))
 	if err != nil {
 		log.Error.Println("Pack message id:", id, " err:", err)
 		return err
@@ -247,8 +249,8 @@ func (c *Connection) SendBufMsg(netWork uint32, operation uint32,
 	}
 
 	// 将 data 封包，并发送
-	dp := NewDataPack()
-	dataBuf, err := dp.Pack(netWork, operation, NewMessage(msgId, data))
+	dp := packet.NewDataPack()
+	dataBuf, err := dp.Pack(netWork, operation, packet.NewMessage(msgId, data))
 	if err != nil {
 		log.Error.Println("Pack message id:", msgId, " err:", err)
 		return err

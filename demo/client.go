@@ -1,7 +1,7 @@
 package main
 
 import (
-	"chalurania/comet"
+	"chalurania/comet/packet"
 	"chalurania/service/log"
 	"io"
 	"net"
@@ -19,8 +19,8 @@ func main() {
 
 	for {
 		// 发送封包消息
-		dp := comet.NewDataPack()
-		msg, _ := dp.Pack(1, 1, comet.NewMessage(102, []byte("First message to server1")))
+		dp := packet.NewDataPack()
+		msg, _ := dp.Pack(1, 1, packet.NewMessage(102, []byte("First message to server1")))
 		_, err := conn.Write(msg)
 		if err != nil {
 			log.Error.Println("Client write message err:", err)
@@ -43,7 +43,7 @@ func main() {
 		}
 
 		if receiveMsg.GetDataLen() > 0 {
-			msg := receiveMsg.(*comet.Message)
+			msg := receiveMsg.(*packet.Message)
 			msg.Data = make([]byte, msg.GetDataLen())
 
 			_, err := io.ReadFull(conn, msg.Data)

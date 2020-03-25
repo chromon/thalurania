@@ -1,4 +1,4 @@
-package comet
+package router
 
 import (
 	"chalurania/api"
@@ -49,7 +49,7 @@ func (rm *RouterManager) AddRouter(requestId uint32, router api.IRouter) {
 		log.Error.Println("Repeated router api, request id:", strconv.Itoa(int(requestId)))
 	}
 
-	// 添加 requestId 与 router api 对应关系
+	// 添加 RequestId 与 router api 对应关系
 	rm.Routers[requestId] = router
 	log.Info.Println("Add router api request id:", requestId)
 }
@@ -83,8 +83,8 @@ func (rm *RouterManager) SendRequestToTaskQueue(request api.IRequest) {
 	// 根据 Conn Id 来分配当前的连接应该由哪个 Worker 负责处理
 	// 轮询的平均分配法，得到需要处理此连接的 worker Id
 	workerId := request.GetConnection().GetConnId() % rm.WorkerPoolSize
-	log.Info.Println("Add conn id:", request.GetConnection().GetConnId(),
-		" request message id:", request.GetMsgID(), " to worker id:", workerId)
+	log.Info.Println("Add Conn id:", request.GetConnection().GetConnId(),
+		" request Message id:", request.GetMsgID(), " to worker id:", workerId)
 
 	// 将请求消息发送给任务队列
 	rm.TaskQueue[workerId] <- request

@@ -2,6 +2,8 @@ package comet
 
 import (
 	"chalurania/api"
+	"chalurania/comet/connection"
+	"chalurania/comet/router"
 	"chalurania/service/config"
 	"chalurania/service/log"
 	"fmt"
@@ -46,8 +48,8 @@ func NewServer() api.IServer {
 		netWork:       "tcp",
 		IP:            config.GlobalObj.Host,
 		Port:          config.GlobalObj.Port,
-		RouterManager: NewRouterManager(),
-		ConnManager:   NewConnectionManager(),
+		RouterManager: router.NewRouterManager(),
+		ConnManager:   connection.NewConnectionManager(),
 	}
 	return s
 }
@@ -100,7 +102,7 @@ func (s *Server) Start() {
 			}
 
 			// 处理新连接请求
-			currentConn := NewConnection(s, conn, cid, s.RouterManager)
+			currentConn := connection.NewConnection(s, conn, cid, s.RouterManager)
 			cid ++
 
 			// 启动当前连接的处理业务

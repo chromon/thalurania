@@ -1,4 +1,4 @@
-package comet
+package packet
 
 import (
 	"bytes"

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"chalurania/db/conn"
+	"chalurania/service/db/conn"
 	"chalurania/service/log"
 	"strings"
+	"time"
 )
 
 const (
@@ -25,12 +26,12 @@ func main() {
 	defer db.Close()
 
 	// 插入
-	//insertId, err := db.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
-	//if err != nil {
-	//	return
-	//}
-	//
-	//log.Info.Println("insert Id：", insertId)
+	insertId, err := db.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
+	if err != nil {
+		return
+	}
+
+	log.Info.Println("insert Id：", insertId)
 
 	// 查询
 	//row, _ := db.Query("select id, nickname from user where id=?", 1)
