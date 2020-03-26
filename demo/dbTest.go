@@ -1,9 +1,7 @@
 package main
 
 import (
-	"chalurania/service/db/conn"
 	"chalurania/service/log"
-	"strings"
 	"time"
 )
 
@@ -17,21 +15,23 @@ const (
 
 func main() {
 
-	path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
-
-	db, err := conn.NewDB("mysql", path)
-	if err != nil {
-		return
-	}
-	defer db.Close()
-
-	// 插入
-	insertId, err := db.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
-	if err != nil {
-		return
-	}
-
-	log.Info.Println("insert Id：", insertId)
+	log.Info.Println(time.Now().UnixNano() / 1e6)
+	log.Info.Println(time.Now())
+	//path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
+	//
+	//db, err := conn.NewDB("mysql", path)
+	//if err != nil {
+	//	return
+	//}
+	//defer db.Close()
+	//
+	//// 插入
+	//insertId, err := db.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
+	//if err != nil {
+	//	return
+	//}
+	//1585186214156329400
+	//log.Info.Println("insert Id：", insertId)
 
 	// 查询
 	//row, _ := db.Query("select id, nickname from user where id=?", 1)
@@ -56,9 +56,9 @@ func main() {
 	//log.Info.Println("affNum:", affNum)
 
 	// 删除
-	affNum, err := db.Delete("delete from user where id = ?", 1)
-	if err != nil {
-		return
-	}
-	log.Info.Println("affNum:", affNum)
+	//affNum, err := db.Delete("delete from user where id = ?", 1)
+	//if err != nil {
+	//	return
+	//}
+	//log.Info.Println("affNum:", affNum)
 }
