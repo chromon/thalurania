@@ -1,4 +1,4 @@
-package main
+package tmp
 
 import (
 	"chalurania/comet/packet"
