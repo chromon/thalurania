@@ -3,7 +3,7 @@ package packet
 // 消息
 type Message struct {
 	// 消息 Id
-	Id uint32
+	Id int64
 
 	// 消息长度
 	DataLen uint32
@@ -13,7 +13,7 @@ type Message struct {
 }
 
 // 创建消息
-func NewMessage(id uint32, data []byte) *Message {
+func NewMessage(id int64, data []byte) *Message {
 	return &Message{
 		Id: id,
 		DataLen: uint32(len(data)),
@@ -22,7 +22,7 @@ func NewMessage(id uint32, data []byte) *Message {
 }
 
 // 获取消息 Id
-func (m *Message) GetMsgId() uint32 {
+func (m *Message) GetMsgId() int64 {
 	return m.Id
 }
 
@@ -37,7 +37,7 @@ func (m *Message) GetData() []byte {
 }
 
 // 设置消息 Id
-func (m *Message) SetMsgId(id uint32) {
+func (m *Message) SetMsgId(id int64) {
 	m.Id = id
 }
 

@@ -222,7 +222,7 @@ func (c *Connection) GetRemoteAddr() net.Addr {
 
 // 将 Message 数据发送到远程 TCP 客户端
 func (c *Connection) SendMsg(netWork uint32, operation uint32,
-	id uint32, data []byte) error {
+	id int64, data []byte) error {
 	if c.isClosed {
 		return errors.New("connection closed when send message")
 	}
@@ -231,7 +231,7 @@ func (c *Connection) SendMsg(netWork uint32, operation uint32,
 	dp := packet.NewDataPack()
 	dataBuf, err := dp.Pack(netWork, operation, packet.NewMessage(id, data))
 	if err != nil {
-		log.Error.Println("Pack message id:", id, " err:", err)
+		log.Error.Println("pack message id:", id, " err:", err)
 		return err
 	}
 
@@ -243,7 +243,7 @@ func (c *Connection) SendMsg(netWork uint32, operation uint32,
 
 // 将 Message 数据发送到远程 TCP 客户端（有缓冲）
 func (c *Connection) SendBufMsg(netWork uint32, operation uint32,
-	msgId uint32, data []byte) error {
+	msgId int64, data []byte) error {
 	if c.isClosed {
 		return errors.New("connection closed when send message")
 	}
@@ -252,7 +252,7 @@ func (c *Connection) SendBufMsg(netWork uint32, operation uint32,
 	dp := packet.NewDataPack()
 	dataBuf, err := dp.Pack(netWork, operation, packet.NewMessage(msgId, data))
 	if err != nil {
-		log.Error.Println("Pack message id:", msgId, " err:", err)
+		log.Error.Println("pack message id:", msgId, " err:", err)
 		return err
 	}
 

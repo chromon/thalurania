@@ -1,4 +1,4 @@
-package tmp
+package main
 
 import (
 	"chalurania/api"
@@ -29,35 +29,35 @@ type HelloRouter struct {
 }
 
 func (h *HelloRouter) Handle(r api.IRequest) {
-	log.Info.Println("Receive from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
+	log.Info.Println("receive from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	// 反向客户端发送数据
 	err := r.GetConnection().SendMsg(1, 2, 201, []byte("Hello data pack2"))
 	if err != nil {
-		log.Error.Println("Send message to client err:", err)
+		log.Error.Println("send message to client err:", err)
 	}
 }
 
 // 创建连接时执行
 func OnConnectionStart(conn api.IConnection) {
-	log.Info.Println("On connection start called...")
+	log.Info.Println("on connection start called...")
 
 	// 设置属性
 	conn.SetProperty("name", "ellery")
 
 	err := conn.SendMsg(1, 2, 301, []byte("Connect success"))
 	if err != nil {
-		log.Error.Println("On conn start err:", err)
+		log.Error.Println("on conn start err:", err)
 	}
 }
 
 // 断开连接时执行
 func OnConnectionLost(conn api.IConnection) {
-	log.Info.Println("On connection lost called...")
+	log.Info.Println("on connection lost called...")
 
 	// 获取属性
 	if name, err := conn.GetProperty("name"); err == nil {
-		log.Info.Println("Conn property name:", name)
+		log.Info.Println("conn property name:", name)
 	}
 }
 

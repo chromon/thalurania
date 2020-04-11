@@ -40,8 +40,8 @@ func NewDataPack() *DataPack {
 
 // 获取包头长度
 func (dp *DataPack) GetHeaderLen() uint32 {
-	// NetWork + Operation + MessageId + DataLen (4 * 4个字节)
-	return 16
+	// NetWork + Operation + MessageId + DataLen (4 * 2 + 8 + 4个字节)
+	return 20
 }
 
 // 封包
@@ -53,34 +53,34 @@ func (dp *DataPack) Pack(netWork uint32, operation uint32, msg api.IMessage) ([]
 	// 将协议版本写入 dataBuf 中
 	err := binary.Write(dataBuf, binary.LittleEndian, netWork)
 	if err != nil {
-		log.Error.Println("Binary write network err:", err)
+		log.Error.Println("binary write network err:", err)
 		return nil, err
 	}
 
 	// 将协议指令 Id 写入 dataBuf 中
 	err = binary.Write(dataBuf, binary.LittleEndian, operation)
 	if err != nil {
-		log.Error.Println("Binary write operation err:", err)
+		log.Error.Println("binary write operation err:", err)
 	}
 
 	// 将 Message id 写入 dataBuf 中
 	err = binary.Write(dataBuf, binary.LittleEndian, msg.GetMsgId())
 	if err != nil {
-		log.Error.Println("Binary write message id err:", err)
+		log.Error.Println("binary write message id err:", err)
 		return nil, err
 	}
 
 	// 将 data length 写入 dataBuf 中
 	err = binary.Write(dataBuf, binary.LittleEndian, msg.GetDataLen())
 	if err != nil {
-		log.Error.Println("Binary write data length err:", err)
+		log.Error.Println("binary write data length err:", err)
 		return nil, err
 	}
 
 	// 将 data 写入 dataBuf 中
 	err = binary.Write(dataBuf, binary.LittleEndian, msg.GetData())
 	if err != nil {
-		log.Error.Println("Binary write data err:", err)
+		log.Error.Println("binary write data err:", err)
 		return nil, err
 	}
 
@@ -101,14 +101,14 @@ func (dp *DataPack) Unpack(binaryData []byte) (uint32, uint32, api.IMessage, err
 	// 读取 Network
 	err := binary.Read(dataBuf, binary.LittleEndian, &netWork)
 	if err != nil {
-		log.Error.Println("Binary read network err:", err)
+		log.Error.Println("binary read network err:", err)
 		return 0, 0, nil, err
 	}
 
 	// 读取 Operation
 	err = binary.Read(dataBuf, binary.LittleEndian, &operation)
 	if err != nil {
-		log.Error.Println("Binary read operation err:", err)
+		log.Error.Println("binary read operation err:", err)
 		return 0, 0, nil, err
 	}
 
@@ -117,21 +117,21 @@ func (dp *DataPack) Unpack(binaryData []byte) (uint32, uint32, api.IMessage, err
 	// 读取 Message Id
 	err = binary.Read(dataBuf, binary.LittleEndian, &msg.Id)
 	if err != nil {
-		log.Error.Println("Binary read message id err:", err)
+		log.Error.Println("binary read message id err:", err)
 		return 0, 0, nil, err
 	}
 
 	// 读取 data length
 	err = binary.Read(dataBuf, binary.LittleEndian, &msg.DataLen)
 	if err != nil {
-		log.Error.Println("Binary read data length err:", err)
+		log.Error.Println("binary read data length err:", err)
 		return 0, 0, nil, err
 	}
 
 	// 判断 data length 长度是否超出允许的最大数据包长度
 	if config.GlobalObj.MaxPacketSize > 0 &&
 		msg.DataLen > config.GlobalObj.MaxPacketSize {
-		log.Error.Println("Too large message data received")
+		log.Error.Println("too large message data received")
 		return 0, 0, nil, errors.New("too large message data received")
 	}
 

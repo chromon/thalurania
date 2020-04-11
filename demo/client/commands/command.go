@@ -1,4 +1,4 @@
-package arguments
+package commands
 
 import (
 	"flag"
@@ -25,9 +25,12 @@ func NewCommand(name string) *Command {
 
 // 初始化命令
 func (c *Command) CommandInit() {
-	c.FlagSet.Int("p", 8080, "server port")
-	c.FlagSet.String("s", "aaa", "string value")
-	c.FlagSet.Bool("b", false, "open file")
+	// 注册
+	c.FlagSet.Bool("r", false, "register an account")
+	// 账户名称
+	c.FlagSet.String("u", "", "account name")
+	// 账户密码
+	c.FlagSet.Bool("p", false, "account password")
 }
 
 // 解析命令
@@ -41,10 +44,6 @@ func (c *Command) ParseCommand(arguments []string) {
 // 遍历命令并将其添加到实际的命令集合中
 func (c *Command) VisitCommand() {
 	fn := func (f *flag.Flag) {
-		fmt.Println("--", f)
-		fmt.Println("--", f.Name)
-		fmt.Println("--", f.Value.String())
-
 		c.CommandMap[f.Name] = f
 	}
 

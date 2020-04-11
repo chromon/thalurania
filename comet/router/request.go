@@ -30,6 +30,6 @@ func (r *Request) GetData() []byte {
 }
 
 // 得到请求的消息 ID
-func (r *Request) GetMsgID() uint32 {
+func (r *Request) GetMsgID() int64 {
 	return r.Message.GetMsgId()
 }

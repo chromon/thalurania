@@ -20,10 +20,10 @@ type IConnection interface {
 	GetRemoteAddr() net.Addr
 
 	// 将 Message 数据发送到远程 TCP 客户端（无缓冲）
-	SendMsg(uint32, uint32, uint32, []byte) error
+	SendMsg(uint32, uint32, int64, []byte) error
 
 	// 将 Message 数据发送到远程 TCP 客户端（有缓冲）
-	SendBufMsg(uint32, uint32, uint32, []byte) error
+	SendBufMsg(uint32, uint32, int64, []byte) error
 
 	// 设置连接属性
 	SetProperty(key string, value interface{})

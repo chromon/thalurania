@@ -31,7 +31,7 @@ func (cm *ConnectionManager) AddConnection(conn api.IConnection) {
 
 	// 将 conn 连接添加到连接管理中
 	cm.connections[conn.GetConnId()] = conn
-	log.Info.Println("Connection add to Connection manager success, connections count:", cm.GetConnectionSize())
+	log.Info.Println("connection add to Connection manager success, connections count:", cm.GetConnectionSize())
 }
 
 // 删除连接仅从 map 中删除，并未停止连接业务
@@ -43,7 +43,7 @@ func (cm *ConnectionManager) RemoveConnection(conn api.IConnection) {
 	// 删除连接信息
 	delete(cm.connections, conn.GetConnId())
 
-	log.Info.Println("Connection removed conn id:", conn.GetConnId(), ", connections count:", cm.GetConnectionSize())
+	log.Info.Println("connection removed conn id:", conn.GetConnId(), ", connections count:", cm.GetConnectionSize())
 }
 
 // 由 connId 获取连接
@@ -78,5 +78,5 @@ func (cm *ConnectionManager) ClearConnection() {
 		delete(cm.connections, connId)
 	}
 
-	log.Info.Println("Clear all connections success, connection count:", cm.GetConnectionSize())
+	log.Info.Println("clear all connections success, connection count:", cm.GetConnectionSize())
 }

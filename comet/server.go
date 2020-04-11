@@ -56,7 +56,7 @@ func NewServer() api.IServer {
 
 // 启动服务器
 func (s *Server) Start() {
-	log.Info.Printf("Server starting at IP: %s, Port: %d", s.IP, s.Port)
+	log.Info.Printf("server starting at IP: %s, Port: %d", s.IP, s.Port)
 
 	// 服务端监听协程
 	go func() {
@@ -68,19 +68,19 @@ func (s *Server) Start() {
 		addrStr := fmt.Sprintf("%s:%d", s.IP, s.Port)
 		addr, err := net.ResolveTCPAddr(s.netWork, addrStr)
 		if err != nil {
-			log.Error.Println("ResolveTCPAddr err:", err)
+			log.Error.Println("resolveTCPAddr err:", err)
 			return
 		}
 
 		// 监听服务器地址
 		listener, err := net.ListenTCP(s.netWork, addr)
 		if err != nil {
-			log.Error.Println("ListenTCP err:", err)
+			log.Error.Println("listenTCP err:", err)
 			return
 		}
 
 		// 服务器正在监听
-		log.Info.Println("Server start success, listening...")
+		log.Info.Println("server start success, listening...")
 
 		// TODO 自动生成 Id
 		var cid uint32 = 0
@@ -90,7 +90,7 @@ func (s *Server) Start() {
 			// 阻塞等待建立连接请求
 			conn, err := listener.AcceptTCP()
 			if err != nil {
-				log.Error.Println("AcceptTCP err:", err)
+				log.Error.Println("acceptTCP err:", err)
 				// 连接失败继续等待下一次连接
 				continue
 			}
@@ -113,7 +113,7 @@ func (s *Server) Start() {
 
 // 停止服务器
 func (s *Server) Stop() {
-	log.Info.Println("Server stop success!")
+	log.Info.Println("server stop success!")
 	// 清理连接
 	s.ConnManager.ClearConnection()
 }
@@ -132,7 +132,7 @@ func (s *Server) Serve() {
 // 给当前服务注册路由方法，供客户端连接处理使用
 func (s *Server)AddRouter(requestId uint32, router api.IRouter) {
 	s.RouterManager.AddRouter(requestId, router)
-	log.Info.Println("Add router success")
+	log.Info.Println("add router success")
 }
 
 // 得到连接管理器
@@ -153,7 +153,7 @@ func (s *Server) SetOnConnStop(hookFunc func (api.IConnection)) {
 // 调用连接 OnConnStart Hook 函数
 func (s *Server) CallOnConnStart(conn api.IConnection) {
 	if s.OnConnStart != nil {
-		log.Info.Println("Call on connection start...")
+		log.Info.Println("call on connection start...")
 		s.OnConnStart(conn)
 	}
 }
@@ -161,7 +161,7 @@ func (s *Server) CallOnConnStart(conn api.IConnection) {
 // 调用连接 OnConnStop Hook 函数
 func (s *Server) CallOnConnStop(conn api.IConnection) {
 	if s.OnConnStop != nil {
-		log.Info.Println("Call on connection stop...")
+		log.Info.Println("call on connection stop...")
 		s.OnConnStop(conn)
 	}
 }
