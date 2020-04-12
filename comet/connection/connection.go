@@ -67,8 +67,7 @@ func NewConnection(server api.IServer, conn *net.TCPConn, connId uint32,
 
 // 处理 conn 读取数据的协程
 func (c *Connection) StartReader() {
-	log.Info.Println("Reader goroutine running...")
-
+	//log.Info.Println("Reader goroutine running...")
 	defer log.Info.Println(c.GetRemoteAddr().String(), " conn reader exit")
 	defer c.Stop()
 
@@ -129,7 +128,7 @@ func (c *Connection) StartReader() {
 
 // 处理 conn 写入数据协程
 func (c *Connection) StartWriter() {
-	log.Info.Println("Writer goroutine running...")
+	//log.Info.Println("Writer goroutine running...")
 	defer log.Info.Println(c.GetRemoteAddr().String(), " conn writer exit")
 
 	for {
@@ -261,7 +260,6 @@ func (c *Connection) SendBufMsg(netWork uint32, operation uint32,
 
 	return nil
 }
-
 
 // 设置连接属性
 func (c *Connection) SetProperty(key string, value interface{}) {

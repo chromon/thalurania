@@ -112,8 +112,6 @@ func (dp *DataPack) Unpack(binaryData []byte) (uint32, uint32, api.IMessage, err
 		return 0, 0, nil, err
 	}
 
-	log.Info.Println("network - operation", netWork, operation)
-
 	// 读取 Message Id
 	err = binary.Read(dataBuf, binary.LittleEndian, &msg.Id)
 	if err != nil {

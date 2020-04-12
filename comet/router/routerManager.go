@@ -4,6 +4,7 @@ import (
 	"chalurania/api"
 	"chalurania/service/config"
 	"chalurania/service/log"
+	"reflect"
 	"strconv"
 )
 
@@ -51,12 +52,13 @@ func (rm *RouterManager) AddRouter(requestId uint32, router api.IRouter) {
 
 	// 添加 RequestId 与 router api 对应关系
 	rm.Routers[requestId] = router
-	log.Info.Println("add router api request id:", requestId)
+
+	log.Info.Printf("add router api [%s] mapping request id - %d", reflect.TypeOf(router).Elem().Name(), requestId)
 }
 
 // 启动一个 Worker
 func (rm *RouterManager) StartWorker(workerId int, taskQueue chan api.IRequest) {
-	log.Info.Println("worker Id:", workerId, "is started")
+	log.Info.Println("worker id -", workerId, "is started")
 	// 循环等待队列中的消息
 	for {
 		select {
@@ -83,8 +85,8 @@ func (rm *RouterManager) SendRequestToTaskQueue(request api.IRequest) {
 	// 根据 Conn Id 来分配当前的连接应该由哪个 Worker 负责处理
 	// 轮询的平均分配法，得到需要处理此连接的 worker Id
 	workerId := request.GetConnection().GetConnId() % rm.WorkerPoolSize
-	log.Info.Println("add Conn id:", request.GetConnection().GetConnId(),
-		" request Message id:", request.GetMsgID(), " to worker id:", workerId)
+	//log.Info.Println("add Conn id:", request.GetConnection().GetConnId(),
+	//	" request Message id:", request.GetMsgID(), " to worker id:", workerId)
 
 	// 将请求消息发送给任务队列
 	rm.TaskQueue[workerId] <- request

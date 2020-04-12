@@ -132,7 +132,6 @@ func (s *Server) Serve() {
 // 给当前服务注册路由方法，供客户端连接处理使用
 func (s *Server)AddRouter(requestId uint32, router api.IRouter) {
 	s.RouterManager.AddRouter(requestId, router)
-	log.Info.Println("add router success")
 }
 
 // 得到连接管理器
@@ -153,7 +152,7 @@ func (s *Server) SetOnConnStop(hookFunc func (api.IConnection)) {
 // 调用连接 OnConnStart Hook 函数
 func (s *Server) CallOnConnStart(conn api.IConnection) {
 	if s.OnConnStart != nil {
-		log.Info.Println("call on connection start...")
+		//log.Info.Println("call on connection start...")
 		s.OnConnStart(conn)
 	}
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"chalurania/api"
 	"chalurania/comet"
+	"chalurania/comet/caller/routers"
 	"chalurania/comet/router"
 	"chalurania/service/log"
 )
@@ -45,10 +46,10 @@ func OnConnectionStart(conn api.IConnection) {
 	// 设置属性
 	conn.SetProperty("name", "ellery")
 
-	err := conn.SendMsg(1, 2, 301, []byte("Connect success"))
-	if err != nil {
-		log.Error.Println("on conn start err:", err)
-	}
+	//err := conn.SendMsg(1, 2, 301, []byte("Connect success"))
+	//if err != nil {
+	//	log.Error.Println("on conn start err:", err)
+	//}
 }
 
 // 断开连接时执行
@@ -70,8 +71,9 @@ func main() {
 	s.SetOnConnStop(OnConnectionLost)
 
 	// 添加自定义路由
-	s.AddRouter(1, &HiRouter{})
-	s.AddRouter(2, &HelloRouter{})
+	s.AddRouter(1, &routers.RegisterRouter{})
+	//s.AddRouter(1, &HiRouter{})
+	//s.AddRouter(2, &HelloRouter{})
 
 	// 开启服务
 	s.Serve()
