@@ -97,7 +97,10 @@ func (s *Server) Start() {
 
 			// 设置服务器最大连接，如果超过最大连接，则丢弃当前连接
 			if s.ConnManager.GetConnectionSize() >= config.GlobalObj.MaxConn {
-				conn.Close()
+				err := conn.Close()
+				if err != nil {
+					log.Error.Println("conn close err:", err)
+				}
 				continue
 			}
 
