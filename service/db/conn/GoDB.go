@@ -41,22 +41,30 @@ func (g *GoDB) Insert(sql string, args ...interface{}) (int64, error) {
 	// 开启事务
 	tx, err := g.DB.Begin()
 	if err != nil {
-		log.Error.Println("Transaction begin err:", err)
+		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Error.Println("transaction rollback err:", err)
+		}
+	}()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
-		log.Error.Println("Statement prepare err:", err)
+		log.Error.Println("statement prepare err:", err)
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Error.Println("statement close err:", err)
+		}
+	}()
 
 	// 执行
 	result, err := stmt.Exec(args...)
 	if err != nil {
-		log.Error.Println("Statement exec err:", err)
+		log.Error.Println("statement exec err:", err)
 		return 0, err
 	}
 
@@ -75,17 +83,25 @@ func (g *GoDB) Insert(sql string, args ...interface{}) (int64, error) {
 func (g *GoDB) Update(sql string, args ...interface{}) (int64, error) {
 	tx, err := g.DB.Begin()
 	if err != nil {
-		log.Error.Println("Transaction begin err:", err)
+		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Error.Println("transaction rollback err:", err)
+		}
+	}()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
-		log.Error.Println("Statement prepare err:", err)
+		log.Error.Println("statement prepare err:", err)
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Error.Println("statement close err:", err)
+		}
+	}()
 
 	result, err := stmt.Exec(args...)
 	if err != nil {
@@ -109,17 +125,25 @@ func (g *GoDB) Update(sql string, args ...interface{}) (int64, error) {
 func (g *GoDB) Delete(sql string, args ...interface{}) (int64, error) {
 	tx, err := g.DB.Begin()
 	if err != nil {
-		log.Error.Println("Transaction begin err:", err)
+		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer tx.Rollback()
+	defer func() {
+		if err := tx.Rollback(); err != nil {
+			log.Error.Println("transaction rollback err:", err)
+		}
+	}()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
-		log.Error.Println("Statement prepare err:", err)
+		log.Error.Println("statement prepare err:", err)
 		return 0, err
 	}
-	defer stmt.Close()
+	defer func() {
+		if err := stmt.Close(); err != nil {
+			log.Error.Println("statement close err:", err)
+		}
+	}()
 
 	result, err := stmt.Exec(args...)
 	if err != nil {

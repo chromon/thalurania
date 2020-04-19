@@ -42,6 +42,33 @@ type Global struct {
 
 	// 配置文件路径
 	ConfigFilePath string
+
+	// redis network
+	RedisNetwork string
+
+	// redis address
+	RedisAddress string
+
+	// redis password
+	RedisPassword string
+
+	// redis database
+	RedisDatabase int
+
+	// mysql username
+	DBUserName string
+
+	// mysql password
+	DBPassword string
+
+	// mysql host
+	DBHost string
+
+	// mysql port
+	DBPort string
+
+	// mysql database name
+	DBName string
 }
 
 // 全局对象
@@ -82,19 +109,29 @@ func (g *Global) Reload() {
 func init() {
 	// 设置全局对象默认值
 	GlobalObj = &Global{
-		Name: "IM Server",
-		Version: "v0.1",
-		Host: "127.0.0.1",
-		Port: 8080,
-		MaxPacketSize: 4096,
-		MaxConn: 10000,
-		WorkerPoolSize: 10,
+		Name:             "IM Server",
+		Version:          "v0.1",
+		Host:             "127.0.0.1",
+		Port:             8080,
+		MaxPacketSize:    4096,
+		MaxConn:          10000,
+		WorkerPoolSize:   10,
 		MaxWorkerTaskLen: 1024,
-		MaxMsgChanLen: 1024,
-		ConfigFilePath: "conf/config.json",
+		MaxMsgChanLen:    1024,
+		ConfigFilePath:   "conf/config.json",
+
+		RedisNetwork:  "tcp",
+		RedisAddress:  "127.0.0.1:6379",
+		RedisPassword: "",
+		RedisDatabase: 0,
+
+		DBUserName: "root",
+		DBPassword: "root",
+		DBHost:     "127.0.0.1",
+		DBPort:     "3306",
+		DBName:     "thalurania",
 	}
 
 	// 从配置文件中重写加载用户自定义配置参数
-	GlobalObj.Reload()
+	//GlobalObj.Reload()
 }
-

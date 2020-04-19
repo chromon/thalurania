@@ -17,13 +17,17 @@ const (
 )
 
 func TestInsert(t *testing.T) {
-	path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
+	dataSource := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
 
-	db, err := conn.NewDB("mysql", path)
+	db, err := conn.NewDB("mysql", dataSource)
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// 插入
 	insertId, err := db.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
@@ -34,17 +38,25 @@ func TestInsert(t *testing.T) {
 }
 
 func TestQuery(t *testing.T) {
-	path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
+	dataSource := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
 
-	db, err := conn.NewDB("mysql", path)
+	db, err := conn.NewDB("mysql", dataSource)
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// 查询
 	row, _ := db.Query("select id, nickname from user where id=?", 1)
-	defer row.Close()
+	defer func() {
+		if err := row.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	for row.Next() {
 		id := 0
@@ -58,13 +70,17 @@ func TestQuery(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
+	dataSource := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
 
-	db, err := conn.NewDB("mysql", path)
+	db, err := conn.NewDB("mysql", dataSource)
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// 更新
 	affNum, err := db.Update("update user set user_id = ? where id = ?", 102, 1)
@@ -76,13 +92,17 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	path := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
+	dataSource := strings.Join([]string{userName, ":", password, "@tcp(", ip, ":", port, ")/", dbName, "?charset=utf8"}, "")
 
-	db, err := conn.NewDB("mysql", path)
+	db, err := conn.NewDB("mysql", dataSource)
 	if err != nil {
 		return
 	}
-	defer db.Close()
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
 
 	// 删除
 	affNum, err := db.Delete("delete from user where id = ?", 1)

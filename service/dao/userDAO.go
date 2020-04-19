@@ -1,7 +1,9 @@
 package dao
 
 import (
+	"chalurania/comet/variable"
 	"chalurania/service/db/conn"
+	"chalurania/service/model"
 	"time"
 )
 
@@ -17,8 +19,9 @@ func NewUserDAO(goDB *conn.GoDB) *UserDAO {
 	}
 }
 
-func (u *UserDAO) AddUser() (int64, error) {
-	insertId, err := u.GoDB.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?)", nil, 101, "ellery", 1, "xxx", time.Now(), time.Now())
+func (u *UserDAO) AddUser(user model.User) (int64, error) {
+	insertId, err := u.GoDB.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?, ?)",
+		nil, variable.IdWorker.GetId(), user.Password, user.Nickname, 0, "", time.Now(), time.Now())
 	if err != nil {
 		return 0, err
 	}

@@ -2,12 +2,19 @@ package comet
 
 import (
 	"chalurania/api"
+	"chalurania/comet/caller/consumers"
 	"chalurania/comet/connection"
 	"chalurania/comet/router"
+	"chalurania/comet/variable"
 	"chalurania/service/config"
+	"chalurania/service/db/conn"
 	"chalurania/service/log"
+	"chalurania/service/pubsub"
+	"chalurania/service/sequence"
+	"context"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -35,10 +42,10 @@ type Server struct {
 	ConnManager api.IConnectionManager
 
 	// Server 连接创建时 Hook 函数
-	OnConnStart func (conn api.IConnection)
+	OnConnStart func(conn api.IConnection)
 
 	// Server 连接断开时的 Hook 函数
-	OnConnStop func (conn api.IConnection)
+	OnConnStop func(conn api.IConnection)
 }
 
 // 初始化服务器
@@ -57,6 +64,32 @@ func NewServer() api.IServer {
 // 启动服务器
 func (s *Server) Start() {
 	log.Info.Printf("server starting at IP: %s, Port: %d", s.IP, s.Port)
+
+	// 初始化 id 生成器
+	variable.IdWorker, _ = sequence.NewWorker(0)
+
+	// 初始化 mysql 数据库连接
+	dataSource := strings.Join([]string{config.GlobalObj.DBUserName, ":", config.GlobalObj.DBPassword,
+		"@tcp(", config.GlobalObj.DBHost, ":", config.GlobalObj.DBPort, ")/", config.GlobalObj.DBName, "?charset=utf8"}, "")
+	var err error
+	variable.GoDB, err = conn.NewDB("mysql", dataSource)
+	if err != nil {
+		return
+	}
+
+	// 启动 redis
+	variable.RedisPool = pubsub.NewRedisPool(config.GlobalObj.RedisAddress,
+		config.GlobalObj.RedisDatabase, config.GlobalObj.RedisPassword)
+	log.Info.Println("redis pool start success, listening...")
+	ctx, _ := context.WithCancel(context.Background())
+
+	// 订阅数据库持久化频道
+	go func() {
+		err := variable.RedisPool.Subscribe(ctx, consumers.Consume, "AsyncPersistence")
+		if err != nil {
+			log.Error.Println("subscribe AsyncPersistence channel err:", err)
+		}
+	}()
 
 	// 服务端监听协程
 	go func() {
@@ -88,7 +121,7 @@ func (s *Server) Start() {
 		// 与客户端建立连接
 		for {
 			// 阻塞等待建立连接请求
-			conn, err := listener.AcceptTCP()
+			c, err := listener.AcceptTCP()
 			if err != nil {
 				log.Error.Println("acceptTCP err:", err)
 				// 连接失败继续等待下一次连接
@@ -97,7 +130,7 @@ func (s *Server) Start() {
 
 			// 设置服务器最大连接，如果超过最大连接，则丢弃当前连接
 			if s.ConnManager.GetConnectionSize() >= config.GlobalObj.MaxConn {
-				err := conn.Close()
+				err := c.Close()
 				if err != nil {
 					log.Error.Println("conn close err:", err)
 				}
@@ -105,8 +138,8 @@ func (s *Server) Start() {
 			}
 
 			// 处理新连接请求
-			currentConn := connection.NewConnection(s, conn, cid, s.RouterManager)
-			cid ++
+			currentConn := connection.NewConnection(s, c, cid, s.RouterManager)
+			cid++
 
 			// 启动当前连接的处理业务
 			go currentConn.Start()
@@ -133,7 +166,7 @@ func (s *Server) Serve() {
 }
 
 // 给当前服务注册路由方法，供客户端连接处理使用
-func (s *Server)AddRouter(requestId uint32, router api.IRouter) {
+func (s *Server) AddRouter(requestId uint32, router api.IRouter) {
 	s.RouterManager.AddRouter(requestId, router)
 }
 
@@ -143,12 +176,12 @@ func (s *Server) GetConnManager() api.IConnectionManager {
 }
 
 // 设置 server 的连接创建时调用的 Hook 函数
-func (s *Server) SetOnConnStart(hookFunc func (api.IConnection)) {
+func (s *Server) SetOnConnStart(hookFunc func(api.IConnection)) {
 	s.OnConnStart = hookFunc
 }
 
 // 设置 server 的连接断开时调用的 Hook 函数
-func (s *Server) SetOnConnStop(hookFunc func (api.IConnection)) {
+func (s *Server) SetOnConnStop(hookFunc func(api.IConnection)) {
 	s.OnConnStop = hookFunc
 }
 

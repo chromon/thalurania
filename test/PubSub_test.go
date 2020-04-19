@@ -16,16 +16,17 @@ func TestPubSub(t *testing.T) {
 		log.Printf("recv msg: %s", msg.Data)
 		return nil
 	}
-	for i := 0; i <10; i++{
+
+	for i := 0; i < 10; i++ {
 		log.Printf("-------------- %d -----------------", i)
 		ctx, cancel := context.WithCancel(context.Background())
-		go func(){
+		go func() {
 			if err := r.Subscribe(ctx, consume, "channel"); err != nil {
 				log.Println("subscribe err:", err)
 			}
 		}()
 		time.Sleep(time.Second)
-		_, err:= r.Publish("channel", "hello, " + strconv.Itoa(i))
+		_, err := r.Publish("channel", "hello, "+strconv.Itoa(i))
 		if err != nil {
 			log.Fatal(err)
 		}

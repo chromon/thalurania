@@ -2,8 +2,11 @@ package routers
 
 import (
 	"chalurania/api"
+	"chalurania/comet/packet"
 	"chalurania/comet/router"
+	"chalurania/comet/variable"
 	"chalurania/service/log"
+	"encoding/json"
 )
 
 // 注册 router
@@ -15,10 +18,20 @@ type RegisterRouter struct {
 func (rr *RegisterRouter) Handle(r api.IRequest) {
 	log.Info.Println("received from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
+	// 将注册信息包装并序列化
+	dw := packet.NewDataWrap(1, r.GetData())
+	log.Info.Println(string(dw.GetModel()))
+	ret, err := json.Marshal(dw)
+	if err != nil {
+		log.Info.Println("serialize register data wrap object err:", err)
+		return
+	}
 
-
-
-
+	// 将序列化后的信息发布到异步存储管道
+	_, err = variable.RedisPool.Publish("AsyncPersistence", string(ret))
+	if err != nil {
+		log.Error.Println("redis pool publish to async persistence err:", err)
+	}
 }
 
 // 回执消息
