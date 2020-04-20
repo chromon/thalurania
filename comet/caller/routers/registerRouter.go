@@ -16,11 +16,10 @@ type RegisterRouter struct {
 
 // 注册处理
 func (rr *RegisterRouter) Handle(r api.IRequest) {
-	log.Info.Println("received from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
+	//log.Info.Println("received from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	// 将注册信息包装并序列化
 	dw := packet.NewDataWrap(1, r.GetData())
-	log.Info.Println(string(dw.GetModel()))
 	ret, err := json.Marshal(dw)
 	if err != nil {
 		log.Info.Println("serialize register data wrap object err:", err)

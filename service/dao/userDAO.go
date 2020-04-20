@@ -21,7 +21,7 @@ func NewUserDAO(goDB *conn.GoDB) *UserDAO {
 
 func (u *UserDAO) AddUser(user model.User) (int64, error) {
 	insertId, err := u.GoDB.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?, ?)",
-		nil, variable.IdWorker.GetId(), user.Password, user.Nickname, 0, "", time.Now(), time.Now())
+		nil, variable.IdWorker.GetId(), user.Nickname, user.Password, 0, "", time.Now(), time.Now())
 	if err != nil {
 		return 0, err
 	}

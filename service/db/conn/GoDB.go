@@ -44,11 +44,7 @@ func (g *GoDB) Insert(sql string, args ...interface{}) (int64, error) {
 		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Error.Println("transaction rollback err:", err)
-		}
-	}()
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
@@ -86,11 +82,7 @@ func (g *GoDB) Update(sql string, args ...interface{}) (int64, error) {
 		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Error.Println("transaction rollback err:", err)
-		}
-	}()
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
@@ -128,11 +120,7 @@ func (g *GoDB) Delete(sql string, args ...interface{}) (int64, error) {
 		log.Error.Println("transaction begin err:", err)
 		return 0, err
 	}
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			log.Error.Println("transaction rollback err:", err)
-		}
-	}()
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {
