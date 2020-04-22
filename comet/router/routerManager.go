@@ -38,7 +38,7 @@ func (rm *RouterManager) ManageRequest(request api.IRequest) {
 	}
 
 	// 执行相应的处理方法
-	manager.PostHandle(request)
+	manager.PreHandle(request)
 	manager.Handle(request)
 	manager.PostHandle(request)
 }

@@ -67,7 +67,7 @@ func init() {
 
 	// 初始化 mysql 数据库连接
 	dataSource := strings.Join([]string{config.GlobalObj.DBUserName, ":", config.GlobalObj.DBPassword,
-		"@tcp(", config.GlobalObj.DBHost, ":", config.GlobalObj.DBPort, ")/", config.GlobalObj.DBName, "?charset=utf8"}, "")
+		"@tcp(", config.GlobalObj.DBHost, ":", config.GlobalObj.DBPort, ")/", config.GlobalObj.DBName, "?charset=utf8&parseTime=true"}, "")
 	var err error
 	variable.GoDB, err = conn.NewDB("mysql", dataSource)
 	if err != nil {

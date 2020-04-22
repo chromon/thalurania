@@ -33,15 +33,11 @@ func (u *UserDAO) AddUser(user model.User) (int64, error) {
 // 查询判断用户名，密码是否正确
 func (u *UserDAO) QueryUserByNamePass(user model.User) (bool, *model.User) {
 	// 查询
-	row, _ := u.GoDB.QueryRow("select * from user where nickname=? && password=?", user.Nickname, user.Password)
-	defer func() {
-		if err := row.Close(); err != nil {
-			panic(err)
-		}
-	}()
+	row := u.GoDB.QueryRow("select * from user where nickname=? && password=?", user.Nickname, user.Password)
 
 	err := row.Scan(&user.Id, &user.UserId, &user.Nickname, &user.Password, &user.Gender, &user.Extra, &user.CreateTime, &user.UpdateTime)
 	if err != nil {
+		//log.Info.Println("check user info err:", err)
 		return false, nil
 	}
 

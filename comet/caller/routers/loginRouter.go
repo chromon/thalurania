@@ -37,6 +37,7 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 		lr.success = true
 		log.Info.Println(user.Nickname)
 		log.Info.Println(user.Password)
+		log.Info.Println(user.CreateTime)
 	} else {
 		// 登录失败
 		lr.success = false
@@ -69,7 +70,7 @@ func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	// 反向客户端发送 ack 数据
 	var loginMsg []byte
 	if lr.success {
-		loginMsg = []byte("login success")
+		loginMsg = []byte("login success, now you can get your message")
 	} else {
 		loginMsg = []byte("login failed, please check your username or password")
 	}

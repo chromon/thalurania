@@ -3,9 +3,9 @@ package logic
 import (
 	"bufio"
 	"chalurania/comet/packet"
-	"chalurania/comet/variable"
 	"chalurania/service/log"
 	"chalurania/service/model"
+	"chalurania/service/sequence"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -17,6 +17,7 @@ import (
 // 登录
 func Login(m map[string]*flag.Flag, conn net.Conn) {
 	scanner := bufio.NewScanner(os.Stdin)
+	IdWorker, _ := sequence.NewWorker(0)
 
 	// 读取密码
 	fmt.Print("~ ")
@@ -37,7 +38,7 @@ func Login(m map[string]*flag.Flag, conn net.Conn) {
 
 	// 封包用户对象消息并发送
 	dp := packet.NewDataPack()
-	msg, _ := dp.Pack(1, 2, packet.NewMessage(variable.IdWorker.GetId(), ret))
+	msg, _ := dp.Pack(1, 2, packet.NewMessage(IdWorker.GetId(), ret))
 	_, err = conn.Write(msg)
 	if err != nil {
 		log.Error.Println("client login write message err:", err)
