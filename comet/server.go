@@ -61,10 +61,7 @@ func NewServer() api.IServer {
 	return s
 }
 
-// 启动服务器
-func (s *Server) Start() {
-	log.Info.Printf("server starting at IP: %s, Port: %d", s.IP, s.Port)
-
+func init() {
 	// 初始化 id 生成器
 	variable.IdWorker, _ = sequence.NewWorker(0)
 
@@ -90,6 +87,11 @@ func (s *Server) Start() {
 			log.Error.Println("subscribe AsyncPersistence channel err:", err)
 		}
 	}()
+}
+
+// 启动服务器
+func (s *Server) Start() {
+	log.Info.Printf("server starting at IP: %s, Port: %d", s.IP, s.Port)
 
 	// 服务端监听协程
 	go func() {

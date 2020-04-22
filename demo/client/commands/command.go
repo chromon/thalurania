@@ -24,6 +24,8 @@ func NewCommand(name string) *Command {
 }
 
 // 初始化命令
+// 注册：tim -r -u 用户名 -p
+// 登录：tim -l -u 用户名 -p
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -31,6 +33,8 @@ func (c *Command) CommandInit() {
 	c.FlagSet.String("u", "", "account name")
 	// 账户密码
 	c.FlagSet.Bool("p", false, "account password")
+	// 登录
+	c.FlagSet.Bool("l", false, "login an account")
 }
 
 // 解析命令

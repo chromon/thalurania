@@ -36,7 +36,7 @@ func (rr *RegisterRouter) Handle(r api.IRequest) {
 // 回执消息
 func (rr *RegisterRouter) PostHandle(r api.IRequest) {
 	// 反向客户端发送 ack 数据
-	err := r.GetConnection().SendMsg(1, 2, 101, []byte("register an account success"))
+	err := r.GetConnection().SendMsg(1, 0, 101, []byte("register an account success, please login again"))
 	if err != nil {
 		log.Error.Println("register send ack message to client err:", err)
 	}

@@ -14,35 +14,17 @@ import (
 	"os"
 )
 
-// 注册
-func SignUp(m map[string]*flag.Flag, conn net.Conn) {
-
+// 登录
+func Login(m map[string]*flag.Flag, conn net.Conn) {
 	scanner := bufio.NewScanner(os.Stdin)
-	var pwd string
 
-	for {
-		// 读取密码
-		fmt.Print("~ ")
-		scanner.Scan()
-		if err := scanner.Err(); err != nil {
-			_, err = fmt.Fprintln(os.Stderr, "error:", err)
-		}
-		pwd = scanner.Text()
-
-		// 读取确认密码
-		fmt.Print("~ ")
-		scanner.Scan()
-		if err := scanner.Err(); err != nil {
-			_, err = fmt.Fprintln(os.Stderr, "error:", err)
-		}
-		cpwd := scanner.Text()
-
-		if pwd == cpwd {
-			break
-		} else {
-			log.Info.Println("the passwords you entered did not match, try again")
-		}
+	// 读取密码
+	fmt.Print("~ ")
+	scanner.Scan()
+	if err := scanner.Err(); err != nil {
+		_, err = fmt.Fprintln(os.Stderr, "error:", err)
 	}
+	pwd := scanner.Text()
 
 	// 创建用户对象
 	u := model.User{Nickname: m["u"].Value.String(), Password: pwd}
@@ -55,10 +37,10 @@ func SignUp(m map[string]*flag.Flag, conn net.Conn) {
 
 	// 封包用户对象消息并发送
 	dp := packet.NewDataPack()
-	msg, _ := dp.Pack(1, 1, packet.NewMessage(variable.IdWorker.GetId(), ret))
+	msg, _ := dp.Pack(1, 2, packet.NewMessage(variable.IdWorker.GetId(), ret))
 	_, err = conn.Write(msg)
 	if err != nil {
-		log.Error.Println("client sign up write message err:", err)
+		log.Error.Println("client login write message err:", err)
 		return
 	}
 
@@ -66,14 +48,14 @@ func SignUp(m map[string]*flag.Flag, conn net.Conn) {
 	header := make([]byte, dp.GetHeaderLen())
 	_, err = io.ReadFull(conn, header)
 	if err != nil {
-		log.Error.Println("client sign up read ack header err:", err)
+		log.Error.Println("client login read ack header err:", err)
 		return
 	}
 
 	// ack 拆包
 	_, _, receiveMsg, err := dp.Unpack(header)
 	if err != nil {
-		log.Error.Println("unpack sign up ack header err:", err)
+		log.Error.Println("unpack login ack header err:", err)
 		return
 	}
 
@@ -83,7 +65,7 @@ func SignUp(m map[string]*flag.Flag, conn net.Conn) {
 
 		_, err := io.ReadFull(conn, msg.Data)
 		if err != nil {
-			log.Error.Println("client unpack sign up ack data err:", err)
+			log.Error.Println("client unpack login ack data err:", err)
 			return
 		}
 		fmt.Println(string(msg.Data))

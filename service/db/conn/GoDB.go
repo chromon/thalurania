@@ -36,6 +36,16 @@ func (g *GoDB) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return result, nil
 }
 
+// 查询单一数据
+func (g *GoDB) QueryRow(query string, args ...interface{}) (*sql.Rows, error) {
+	result, err := g.DB.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 // 插入数据
 func (g *GoDB) Insert(sql string, args ...interface{}) (int64, error) {
 	// 开启事务

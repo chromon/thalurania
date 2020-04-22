@@ -47,10 +47,13 @@ func main() {
 		// 命令分发
 		switch commands.CommandDistribute(c.CommandMap) {
 		case 0:
-			fmt.Println("combined commands not found")
+			fmt.Println("commands not found")
 		case 1:
 			// 注册命令
 			logic.SignUp(c.CommandMap, conn)
+		case 2:
+			// 登录命令
+			logic.Login(c.CommandMap, conn)
 		}
 	}
 

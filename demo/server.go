@@ -72,6 +72,7 @@ func main() {
 
 	// 添加自定义路由
 	s.AddRouter(1, &routers.RegisterRouter{})
+	s.AddRouter(2, &routers.LoginRouter{})
 	//s.AddRouter(1, &HiRouter{})
 	//s.AddRouter(2, &HelloRouter{})
 
