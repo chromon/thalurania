@@ -69,6 +69,14 @@ func Login(m map[string]*flag.Flag, conn net.Conn) {
 			log.Error.Println("client unpack login ack data err:", err)
 			return
 		}
-		fmt.Println(string(msg.Data))
+
+		// 获取 ack
+		var ackPack packet.AckPack
+		err = json.Unmarshal(msg.Data, &ackPack)
+		if err != nil {
+			fmt.Printf("unmarshal ack pack err=%v\n", err)
+		}
+
+		fmt.Println(string(ackPack.Data))
 	}
 }
