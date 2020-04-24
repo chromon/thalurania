@@ -4,6 +4,7 @@ import (
 	"chalurania/api"
 	"chalurania/comet"
 	"chalurania/comet/caller/routers"
+	"chalurania/comet/constants"
 	"chalurania/comet/router"
 	"chalurania/service/log"
 )
@@ -71,8 +72,8 @@ func main() {
 	s.SetOnConnStop(OnConnectionLost)
 
 	// 添加自定义路由
-	s.AddRouter(1, &routers.RegisterRouter{})
-	s.AddRouter(2, &routers.LoginRouter{})
+	s.AddRouter(constants.SignUpOption, &routers.RegisterRouter{})
+	s.AddRouter(constants.LoginOption, &routers.LoginRouter{})
 	//s.AddRouter(1, &HiRouter{})
 	//s.AddRouter(2, &HelloRouter{})
 

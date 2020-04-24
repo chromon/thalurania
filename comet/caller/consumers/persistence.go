@@ -1,6 +1,7 @@
 package consumers
 
 import (
+	"chalurania/comet/constants"
 	"chalurania/comet/packet"
 	"chalurania/comet/variable"
 	"chalurania/service/dao"
@@ -23,7 +24,7 @@ func Consume(msg redis.Message) error {
 	}
 
 	switch dw.Opt {
-	case 1:
+	case constants.SignUpPersistenceOpt:
 		// 插入新用户
 		err = insertUser(dw.Model)
 		if err != nil {

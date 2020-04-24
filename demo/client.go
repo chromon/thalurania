@@ -2,13 +2,16 @@ package main
 
 import (
 	"bufio"
+	"chalurania/comet/packet"
 	"chalurania/demo/client/commands"
 	"chalurania/demo/client/logic"
 	"chalurania/service/log"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -26,109 +29,149 @@ func main() {
 
 	fmt.Println("welcome to thalurania im")
 
+	// 读取命令并发送到服务器
+	go func() {
+		for {
+			// 创建命令并初始化
+			c := commands.NewCommand("tim")
+			c.CommandInit()
+
+			// 命令提示符
+			fmt.Print("~ ")
+			// 读取命令
+			scanner.Scan()
+			if err := scanner.Err(); err != nil {
+				_, err = fmt.Fprintln(os.Stderr, "error:", err)
+			}
+			args = scanner.Text()
+
+			// 解析命令
+			c.ParseCommand(strings.Split(args, " ")[1:])
+			c.VisitCommand()
+
+			// 命令分发
+			switch commands.CommandDistribute(c.CommandMap) {
+			case 0:
+				fmt.Println("commands not found")
+			case 1:
+				// 注册命令
+				logic.SignUp(c.CommandMap, conn)
+			case 2:
+				// 登录命令
+				logic.Login(c.CommandMap, conn)
+			}
+		}
+	}()
+
+	// 接收服务器发送的消息
+	go func() {
+		for {
+			dp := packet.NewDataPack()
+			// 读取流中的消息回执 ack 数据包 header 部分
+			header := make([]byte, dp.GetHeaderLen())
+			_, err = io.ReadFull(conn, header)
+			if err != nil {
+				log.Error.Println("client read ack header err:", err)
+				return
+			}
+
+			// ack 拆包
+			_, _, receiveMsg, err := dp.Unpack(header)
+			if err != nil {
+				log.Error.Println("unpack data header err:", err)
+				return
+			}
+
+			if receiveMsg.GetDataLen() > 0 {
+				msg := receiveMsg.(*packet.Message)
+				msg.Data = make([]byte, msg.GetDataLen())
+
+				_, err := io.ReadFull(conn, msg.Data)
+				if err != nil {
+					log.Error.Println("client unpack data err:", err)
+					return
+				}
+				//fmt.Println(string(msg.Data))
+				fmt.Printf("\b\bServer feedback: %s \n", string(msg.Data))
+				fmt.Print("~ ")
+				//os.Exit(0)
+			}
+		}
+	}()
+
 	for {
-		// 创建命令并初始化
-		c := commands.NewCommand("tim")
-		c.CommandInit()
-
-		// 命令提示符
-		fmt.Print("~ ")
-		// 读取命令
-		scanner.Scan()
-		if err := scanner.Err(); err != nil {
-			_, err = fmt.Fprintln(os.Stderr, "error:", err)
-		}
-		args = scanner.Text()
-
-		// 解析命令
-		c.ParseCommand(strings.Split(args, " ")[1:])
-		c.VisitCommand()
-
-		// 命令分发
-		switch commands.CommandDistribute(c.CommandMap) {
-		case 0:
-			fmt.Println("commands not found")
-		case 1:
-			// 注册命令
-			logic.SignUp(c.CommandMap, conn)
-		case 2:
-			// 登录命令
-			logic.Login(c.CommandMap, conn)
-		}
+		time.Sleep(time.Second)
 	}
 
-
-
-
-
-
-
-
-
-
 	//for {
+	//	// 创建命令并初始化
+	//	c := commands.NewCommand("tim")
+	//	c.CommandInit()
 	//
-	//
-	//
-	//
-	//	// 发送封包消息
-	//	dp := packet.NewDataPack()
-	//	msg, _ := dp.Pack(1, 1, packet.NewMessage(102, []byte("First message to server1")))
-	//	_, err := conn.Write(msg)
-	//	if err != nil {
-	//		log.Error.Println("Client write message err:", err)
-	//		return
+	//	// 命令提示符
+	//	fmt.Print("~ ")
+	//	// 读取命令
+	//	scanner.Scan()
+	//	if err := scanner.Err(); err != nil {
+	//		_, err = fmt.Fprintln(os.Stderr, "error:", err)
 	//	}
+	//	args = scanner.Text()
 	//
-	//	// 读取流中的数据包 header 部分
-	//	header := make([]byte, dp.GetHeaderLen())
-	//	_, err = io.ReadFull(conn, header)
-	//	if err != nil {
-	//		log.Error.Println("Client read header err:", err)
-	//		break
-	//	}
+	//	// 解析命令
+	//	c.ParseCommand(strings.Split(args, " ")[1:])
+	//	c.VisitCommand()
 	//
-	//	// 拆包
-	//	network, operation, receiveMsg, err := dp.Unpack(header)
-	//	if err != nil {
-	//		log.Error.Println("Unpack err:", err)
-	//		return
-	//	}
-	//
-	//	if receiveMsg.GetDataLen() > 0 {
-	//		msg := receiveMsg.(*packet.Message)
-	//		msg.Data = make([]byte, msg.GetDataLen())
-	//
-	//		_, err := io.ReadFull(conn, msg.Data)
+	//	// 命令分发
+	//	switch commands.CommandDistribute(c.CommandMap) {
+	//	case 0:
+	//		fmt.Println("commands not found")
+	//	case 1:
+	//		// 注册命令
+	//		logic.SignUp(c.CommandMap, conn)
+	//	case 2:
+	//		// 登录命令
+	//		s, err := logic.Login(c.CommandMap, conn)
 	//		if err != nil {
-	//			log.Error.Println("Server unpack data err:", err)
-	//			return
+	//			fmt.Println("login err:", err)
 	//		}
-	//		log.Info.Printf("Server feedback message id: %d - %s, len: %d, network: %d, opertion: %d", msg.Id, msg.Data, msg.DataLen, network, operation)
+	//		sign = s
 	//	}
 	//
-	//	time.Sleep(time.Second)
+	//	//if sign {
+	//	//	sign = false
+	//	//	// 读取信息
+	//	//	go func() {
+	//	//		for {
+	//	//			dp := packet.NewDataPack()
+	//	//			// 读取流中的消息回执 ack 数据包 header 部分
+	//	//			header := make([]byte, dp.GetHeaderLen())
+	//	//			_, err = io.ReadFull(conn, header)
+	//	//			if err != nil {
+	//	//				log.Error.Println("client read ack header err:", err)
+	//	//				return
+	//	//			}
+	//	//
+	//	//			// ack 拆包
+	//	//			_, _, receiveMsg, err := dp.Unpack(header)
+	//	//			if err != nil {
+	//	//				log.Error.Println("unpack data header err:", err)
+	//	//				return
+	//	//			}
+	//	//
+	//	//			if receiveMsg.GetDataLen() > 0 {
+	//	//				msg := receiveMsg.(*packet.Message)
+	//	//				msg.Data = make([]byte, msg.GetDataLen())
+	//	//
+	//	//				_, err := io.ReadFull(conn, msg.Data)
+	//	//				if err != nil {
+	//	//					log.Error.Println("client unpack data err:", err)
+	//	//					return
+	//	//				}
+	//	//				fmt.Println(string(msg.Data))
+	//	//				os.Exit(0)
+	//	//			}
+	//	//		}
+	//	//	}()
+	//	//}
 	//}
-	//
-	//
-	//g := Girl{"satori", 16, "f"}
-	//
-	////ret, err := json.MarshalIndent(g, "", " ")
-	//ret, err := json.Marshal(g)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//} else {
-	//	fmt.Println(string(ret))
-	//}
-	//
-	////创建一个变量
-	//g2 := Girl{}
-	////传入json字符串，和指针
-	//err = json.Unmarshal(ret, &g2)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//fmt.Println(g2)  //{satori 16 f 东方地灵殿 false}
-	//fmt.Println(g2.Name, g2.Age) // satori 16
 }
