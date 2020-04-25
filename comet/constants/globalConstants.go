@@ -25,10 +25,19 @@ const (
 
 	// 登录
 	LoginAckOpt = 302
+
+	// 设备下线
+	DeviceOffline = 303
 )
 
 // 网络协议
 const (
 	// tcp
 	TCPNetwork = 401
+)
+
+// 服务器数据传输指令
+const (
+	// 强制下线
+	KickOut = 501
 )

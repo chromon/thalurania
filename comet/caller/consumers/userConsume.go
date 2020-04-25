@@ -3,50 +3,58 @@ package consumers
 import (
 	"chalurania/api"
 	"chalurania/comet/constants"
-	"chalurania/comet/variable"
+	"chalurania/comet/packet"
 	"chalurania/service/log"
 	"chalurania/service/model"
-	"context"
+	"encoding/json"
 	"github.com/gomodule/redigo/redis"
-	"strconv"
 )
 
-// 处理用户信息(缓存登录状态，订阅频道)
-func UserConsume(user *model.User, r api.IRequest) {
-	// 读取订阅频道发送的数据，并使用 tcp 连接发送到客户端
+// 处理 channel 订阅到的信息
+type UserConsume struct {
+	User *model.User
+	Request api.IRequest
+}
 
-	// 获取 redis 连接
-	redisConn := variable.RedisPool.Pool.Get()
-	defer func() {
-		if err := redisConn.Close(); err != nil {
-			log.Error.Println("redis conn close err:", err)
-			return
-		}
-	}()
+func NewUserConsume(u *model.User, r api.IRequest) *UserConsume {
+	return &UserConsume{
+		User: u,
+		Request: r,
+	}
+}
 
-	// 订阅自己的频道
-	ctx, _ := context.WithCancel(context.Background())
-	// 用户频道名称
-	chanName := "UserChannel:" + strconv.FormatInt(user.UserId,10)
-	go func() {
-		//log.Info.Println(chanName)
+func (uc *UserConsume) Consume() func(redis.Message) error {
+	return func(msg redis.Message) error {
+		log.Info.Printf("user consume recv msg: %s", msg.Data)
 
-		// 从订阅频道接收消息处理回调函数
-		consume := func(msg redis.Message) error {
-			log.Info.Printf("recv msg: %s", msg.Data)
-			err := r.GetConnection().SendMsg(1, constants.AckOption, 101, msg.Data)
-			if err != nil {
-				log.Error.Println("user consumer message to client err:", err)
-			}
-			return nil
-		}
-
-		// 订阅频道
-		err := variable.RedisPool.Subscribe(ctx, consume, chanName)
+		// 服务器内部数据传输包，用于区分 channel 消息的类型（踢人，聊天...）
+		var stp packet.ServerTransPack
+		err := json.Unmarshal(msg.Data, &stp)
 		if err != nil {
-			log.Error.Println("subscribe UserConsume channel err:", err)
+			log.Error.Printf("unmarshal server trans pack err: %v\n", err)
+			return err
 		}
-	}()
 
+		var ackPack *packet.ServerAckPack
+		switch stp.Opt {
+		case constants.KickOut:
+			// 踢人，迫使另一设备下线
+			ackPack = packet.NewServerAckPack(constants.DeviceOffline, true, stp.Data)
+		}
 
+		// 序列化 ack 并向客户端发送
+		ret, err := json.Marshal(ackPack)
+		if err != nil {
+			log.Info.Println("serialize login ack pack object err:", err)
+			return err
+		}
+
+		// 向客户端发送信息
+		err = uc.Request.GetConnection().SendMsg(constants.TCPNetwork, constants.AckOption, 101, ret)
+		if err != nil {
+			log.Error.Println("user consumer message to client err:", err)
+			return err
+		}
+		return nil
+	}
 }

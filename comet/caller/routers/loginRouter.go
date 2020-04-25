@@ -11,6 +11,7 @@ import (
 	"chalurania/service/log"
 	"chalurania/service/model"
 	"chalurania/service/scrypt"
+	"context"
 	"encoding/json"
 	"strconv"
 )
@@ -28,7 +29,7 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 	var u model.User
 	err := json.Unmarshal(r.GetData(), &u)
 	if err != nil {
-		log.Error.Printf("unmarshal user err=%v\n", err)
+		log.Error.Printf("unmarshal user err: %v\n", err)
 	}
 	// 加密密码
 	u.Password = scrypt.Crypto(u.Password)
@@ -37,7 +38,6 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 	userDAO := dao.NewUserDAO(variable.GoDB)
 	exist, user := userDAO.QueryUserByNamePass(u)
 	if exist {
-
 		// 登录成功，校验用户的频道是否存在，存在则 publish 消息告诉另一个连接下线， 然后当前连接再 subscribe 订阅用户频道
 		// 获取 redis 连接
 		redisConn := variable.RedisPool.Pool.Get()
@@ -59,18 +59,36 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 
 		if res != nil {
 			// 用户已登录
-			// publish 消息告诉另一个连接下线
+			serverTransPack := packet.NewServerTransPack(constants.KickOut, []byte("oops account has been logged in on other devices, you are offline..."))
+			ret, err := json.Marshal(serverTransPack)
+			if err != nil {
+				log.Info.Println("serialize server trans pack (kick out) object err:", err)
+				return
+			}
+
 			log.Info.Println("already logged in")
-			_, err = variable.RedisPool.Publish(chanName, "account has been logged in on other devices")
+			// publish 消息(pack)告诉另一个连接下线
+			_, err = variable.RedisPool.Publish(chanName, string(ret))
 			if err != nil {
 				log.Error.Println("redis pool publish to async persistence err:", err)
+				return
 			}
 		}
 
 		// 存储用户信息和连接信息
 		lr.success = true
-		// 处理用户信息(缓存登录状态，订阅频道)
-		consumers.UserConsume(user, r)
+		// 处理 channel 订阅到的信息
+		uc := consumers.NewUserConsume(user, r)
+
+		// 订阅自己的频道
+		ctx, _ := context.WithCancel(context.Background())
+		go func() {
+			// 订阅频道
+			err := variable.RedisPool.Subscribe(ctx, uc.Consume(), chanName)
+			if err != nil {
+				log.Error.Println("subscribe UserConsume channel err:", err)
+			}
+		}()
 
 		// 将频道存储在 redis hash 中
 		// 用户频道名定义：key - "user:用户id"，field - channel， value - "UserChannel：用户id"
@@ -95,7 +113,7 @@ func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	}
 
 	// 包装 ack
-	ackPack := packet.NewAckPack(constants.LoginAckOpt, lr.success, loginMsg)
+	ackPack := packet.NewServerAckPack(constants.LoginAckOpt, lr.success, loginMsg)
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
 		log.Info.Println("serialize login ack pack object err:", err)
@@ -103,7 +121,7 @@ func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	}
 
 	// 发送回执
-	err = r.GetConnection().SendMsg(1, constants.AckOption, 101, ret)
+	err = r.GetConnection().SendMsg(constants.TCPNetwork, constants.AckOption, 101, ret)
 	if err != nil {
 		log.Error.Println("login send ack message to client err:", err)
 	}

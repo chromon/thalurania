@@ -17,7 +17,7 @@ import (
 // 消费者订阅消息处理回调函数
 func Consume(msg redis.Message) error {
 	// json 解析 data wrap 数据
-	var dw packet.DataWrap
+	var dw packet.DataPersistWrap
 	err := json.Unmarshal(msg.Data, &dw)
 	if err != nil {
 		fmt.Printf("unmarshal data wrap err=%v\n", err)
