@@ -53,14 +53,17 @@ func main() {
 
 			// 命令分发
 			switch commands.CommandDistribute(c.CommandMap) {
-			case 0:
+			case constants.ErrorCommand:
 				fmt.Println("commands not found")
-			case 1:
+			case constants.RegisterCommand:
 				// 注册命令
 				logic.SignUp(c.CommandMap, conn)
-			case 2:
+			case constants.LoginCommand:
 				// 登录命令
 				logic.Login(c.CommandMap, conn)
+			case constants.LogoutCommand:
+				// 登出命令
+				logic.Logout(conn)
 			}
 		}
 	}()
@@ -77,7 +80,7 @@ func main() {
 				return
 			}
 
-			// ack 拆包
+			// 将服务端返回的 ack header 信息拆包
 			_, _, receiveMsg, err := dp.Unpack(header)
 			if err != nil {
 				log.Error.Println("unpack data header err:", err)
@@ -88,12 +91,14 @@ func main() {
 				msg := receiveMsg.(*packet.Message)
 				msg.Data = make([]byte, msg.GetDataLen())
 
+				// 读取消息内容
 				_, err := io.ReadFull(conn, msg.Data)
 				if err != nil {
 					log.Error.Println("client unpack data err:", err)
 					return
 				}
 
+				// 解析 json 类型消息为 ack 包
 				var ackPack packet.ServerAckPack
 				err = json.Unmarshal(msg.Data, &ackPack)
 				if err != nil {
@@ -102,10 +107,20 @@ func main() {
 
 				switch ackPack.Opt {
 				case constants.LoginAckOpt:
+					// 登录
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.DeviceOffline:
+					// 被动离线
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 					os.Exit(0)
+				case constants.LogoutAckOpt:
+					if ackPack.Sign {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+						os.Exit(0)
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+						os.Exit(1)
+					}
 				}
 
 				fmt.Print("~ ")

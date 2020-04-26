@@ -1,18 +1,26 @@
 package commands
 
-import "flag"
+import (
+	"chalurania/comet/constants"
+	"flag"
+)
 
 // 命令分发
 func CommandDistribute(m map[string]*flag.Flag) int32 {
-
-	// 注册
+	
 	if RegCommand(m) {
-		return 1
+		// 注册命令
+		return constants.RegisterCommand
 	} else if LoginCommand(m) {
-		return 2
+		// 登录命令
+		return constants.LoginCommand
+	} else if LogoutCommand(m) {
+		// 登出命令
+		return constants.LogoutCommand
 	}
 
-	return 0
+	// 无效命令
+	return constants.ErrorCommand
 }
 
 // 注册命令
@@ -37,4 +45,10 @@ func LoginCommand(m map[string]*flag.Flag) bool {
 		return true
 	}
 	return false
+}
+
+// 登出命令
+func LogoutCommand(m map[string]*flag.Flag) bool {
+	_, q := m["q"]
+	return q
 }

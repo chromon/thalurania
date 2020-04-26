@@ -24,7 +24,7 @@ type LoginRouter struct {
 
 // 登录处理
 func (lr *LoginRouter) Handle(r api.IRequest) {
-	log.Info.Println("received from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
+	//log.Info.Println("received from client logic message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	var u model.User
 	err := json.Unmarshal(r.GetData(), &u)
@@ -66,7 +66,6 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 				return
 			}
 
-			log.Info.Println("already logged in")
 			// publish 消息(pack)告诉另一个连接下线
 			_, err = variable.RedisPool.Publish(chanName, string(ret))
 			if err != nil {
@@ -96,6 +95,9 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 		if err != nil {
 			log.Error.Println("redis hash set user info err:", err)
 		}
+
+		// 保存当前登录用户属性到连接中
+		r.GetConnection().SetProperty("user", user)
 	} else {
 		// 登录失败
 		lr.success = false
@@ -116,7 +118,7 @@ func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	ackPack := packet.NewServerAckPack(constants.LoginAckOpt, lr.success, loginMsg)
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
-		log.Info.Println("serialize login ack pack object err:", err)
+		log.Info.Println("serialize logic ack pack object err:", err)
 		return
 	}
 

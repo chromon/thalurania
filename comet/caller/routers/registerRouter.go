@@ -17,7 +17,7 @@ type RegisterRouter struct {
 
 // 注册处理
 func (rr *RegisterRouter) Handle(r api.IRequest) {
-	//log.Info.Println("received from client message id:", r.GetMsgID(), " data:", string(r.GetData()))
+	//log.Info.Println("received from client register message id:", r.GetMsgID(), " data:", string(r.GetData()))
 
 	// 将注册信息包装并序列化
 	dw := packet.NewDataPersistWrap(constants.SignUpPersistenceOpt, r.GetData())
@@ -39,10 +39,10 @@ func (rr *RegisterRouter) Handle(r api.IRequest) {
 func (rr *RegisterRouter) PostHandle(r api.IRequest) {
 
 	// 包装 ack
-	ackPack := packet.NewServerAckPack(constants.SignUpAckOpt, true, []byte("register an account success, please login again"))
+	ackPack := packet.NewServerAckPack(constants.SignUpAckOpt, true, []byte("register an account success, please logic again"))
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
-		log.Info.Println("serialize login ack pack object err:", err)
+		log.Info.Println("serialize register ack pack object err:", err)
 		return
 	}
 

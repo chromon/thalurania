@@ -45,7 +45,7 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 		// 序列化 ack 并向客户端发送
 		ret, err := json.Marshal(ackPack)
 		if err != nil {
-			log.Info.Println("serialize login ack pack object err:", err)
+			log.Info.Println("serialize logic ack pack object err:", err)
 			return err
 		}
 

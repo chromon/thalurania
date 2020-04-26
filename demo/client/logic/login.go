@@ -40,6 +40,6 @@ func Login(m map[string]*flag.Flag, conn net.Conn) {
 	msg, _ := dp.Pack(constants.TCPNetwork, constants.LoginOption, packet.NewMessage(IdWorker.GetId(), ret))
 	_, err = conn.Write(msg)
 	if err != nil {
-		log.Error.Println("client login write message err:", err)
+		log.Error.Println("client logic write message err:", err)
 	}
 }
