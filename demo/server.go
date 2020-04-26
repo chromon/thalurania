@@ -5,15 +5,15 @@ import (
 	"chalurania/comet"
 	"chalurania/comet/caller/routers"
 	"chalurania/comet/constants"
+	"chalurania/comet/variable"
 	"chalurania/service/log"
+	"chalurania/service/model"
+	"strconv"
 )
 
 // 创建连接时执行
 func OnConnectionStart(conn api.IConnection) {
 	log.Info.Println("on connection start called...")
-
-	// 设置属性
-	conn.SetProperty("name", "ellery")
 }
 
 // 断开连接时执行
@@ -21,8 +21,28 @@ func OnConnectionLost(conn api.IConnection) {
 	log.Info.Println("on connection lost called...")
 
 	// 获取属性
-	if name, err := conn.GetProperty("name"); err == nil {
-		log.Info.Println("conn property name:", name)
+	user, err := conn.GetProperty("user")
+	if err != nil {
+		log.Error.Println("conn get user property err:", err)
+		return
+	}
+
+	// 获取 redis 连接
+	redisConn := variable.RedisPool.Pool.Get()
+	defer func() {
+		if err := redisConn.Close(); err != nil {
+			log.Error.Println("redis conn close err:", err)
+			return
+		}
+	}()
+
+	u := user.(*model.User)
+
+	// 删除掉 redis 中的用户登录信息
+	_, err = redisConn.Do("hdel", "user:" + strconv.FormatInt(u.UserId, 10), "channel")
+	if err != nil {
+		log.Error.Println("redis hash del user info err:", err)
+		return
 	}
 }
 

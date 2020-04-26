@@ -13,7 +13,7 @@ type RouterManager struct {
 	Routers map[uint32] api.IRouter
 
 	// 业务工作池数量
-	WorkerPoolSize uint32
+	WorkerPoolSize int64
 
 	// 任务队列，request 请求信息的 channel 集合，worker 会从对应的队列中获取客户端请求数据并处理
 	TaskQueue []chan api.IRequest

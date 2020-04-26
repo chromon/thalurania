@@ -32,7 +32,7 @@ type Global struct {
 	MaxConn int
 
 	// 业务工作池的数量
-	WorkerPoolSize uint32
+	WorkerPoolSize int64
 
 	// 业务工作池对应的任务队列最大任务数
 	MaxWorkerTaskLen uint32

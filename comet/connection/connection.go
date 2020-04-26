@@ -20,7 +20,7 @@ type Connection struct {
 	Conn *net.TCPConn
 
 	// 连接 Id
-	ConnId uint32
+	ConnId int64
 
 	// 连接是否关闭
 	isClosed bool
@@ -45,7 +45,7 @@ type Connection struct {
 }
 
 // 创建连接
-func NewConnection(server api.IServer, conn *net.TCPConn, connId uint32,
+func NewConnection(server api.IServer, conn *net.TCPConn, connId int64,
 	requestManager api.IRouterManager) *Connection {
 	c := &Connection{
 		TCPServer:      server,
@@ -68,7 +68,7 @@ func NewConnection(server api.IServer, conn *net.TCPConn, connId uint32,
 // 处理 conn 读取数据的协程
 func (c *Connection) StartReader() {
 	//log.Info.Println("Reader goroutine running...")
-	defer log.Info.Println(c.GetRemoteAddr().String(), " conn reader exit")
+	//defer log.Info.Println(c.GetRemoteAddr().String(), " conn reader exit")
 	defer c.Stop()
 
 	// 循环读取数据
@@ -129,7 +129,7 @@ func (c *Connection) StartReader() {
 // 处理 conn 写入数据协程
 func (c *Connection) StartWriter() {
 	//log.Info.Println("Writer goroutine running...")
-	defer log.Info.Println(c.GetRemoteAddr().String(), " conn writer exit")
+	//defer log.Info.Println(c.GetRemoteAddr().String(), " conn writer exit")
 
 	for {
 		select {
@@ -210,7 +210,7 @@ func (c *Connection) GetTCPConnection() *net.TCPConn {
 }
 
 // 获取当前连接 Id
-func (c *Connection) GetConnId() uint32 {
+func (c *Connection) GetConnId() int64 {
 	return c.ConnId
 }
 

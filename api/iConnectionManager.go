@@ -9,7 +9,7 @@ type IConnectionManager interface {
 	RemoveConnection(IConnection)
 
 	// 由 connId 获取连接
-	GetConnection(uint32) (IConnection, error)
+	GetConnection(int64) (IConnection, error)
 
 	// 当前连接数量
 	GetConnectionSize() int

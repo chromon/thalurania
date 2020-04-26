@@ -117,9 +117,6 @@ func (s *Server) Start() {
 		// 服务器正在监听
 		log.Info.Println("server start success, listening...")
 
-		// TODO 自动生成 Id
-		var cid uint32 = 0
-
 		// 与客户端建立连接
 		for {
 			// 阻塞等待建立连接请求
@@ -140,8 +137,7 @@ func (s *Server) Start() {
 			}
 
 			// 处理新连接请求
-			currentConn := connection.NewConnection(s, c, cid, s.RouterManager)
-			cid++
+			currentConn := connection.NewConnection(s, c, variable.IdWorker.GetId(), s.RouterManager)
 
 			// 启动当前连接的处理业务
 			go currentConn.Start()
