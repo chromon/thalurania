@@ -8,6 +8,7 @@ CREATE TABLE `user`
 (
   `id`          bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_id`     bigint(20) unsigned NOT NULL COMMENT '用户id',
+  `username`    varchar(20)         NOT NULL COMMENT '用户名',
   `nickname`    varchar(20)         NOT NULL COMMENT '昵称',
   `password`    varchar(44)         NOT NULL COMMENT '密码',
   `gender`      tinyint(4)          NOT NULL COMMENT '性别，0:未知；1:男；2:女',

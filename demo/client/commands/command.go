@@ -27,6 +27,8 @@ func NewCommand(name string) *Command {
 // 注册：tim -r -u 用户名 -p
 // 登录：tim -l -u 用户名 -p
 // 登出：tim -q
+// 搜索：tim -s -u 用户名
+// 		tim -s -n 用户 id
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -38,6 +40,10 @@ func (c *Command) CommandInit() {
 	c.FlagSet.Bool("l", false, "logic an account")
 	// 登出
 	c.FlagSet.Bool("q", false, "logout an account")
+	// 搜索
+	c.FlagSet.Bool("s", false, "search")
+	// 用户 id
+	c.FlagSet.String("n", "", "account id")
 }
 
 // 解析命令

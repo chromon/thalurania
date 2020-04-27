@@ -10,6 +10,9 @@ type User struct {
 	// 用户 Id
 	UserId int64 `json:"user_id"`
 
+	// 用户名
+	Username string `json:"username"`
+
 	// 用户密码
 	Password string `json:"password"`
 

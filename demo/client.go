@@ -106,6 +106,9 @@ func main() {
 				}
 
 				switch ackPack.Opt {
+				case constants.SignUpAckOpt:
+					// 注册
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.LoginAckOpt:
 					// 登录
 					fmt.Printf("\b\b%s \n", ackPack.Data)

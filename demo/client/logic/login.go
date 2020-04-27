@@ -28,7 +28,7 @@ func Login(m map[string]*flag.Flag, conn net.Conn) {
 	pwd := scanner.Text()
 
 	// 创建用户对象
-	u := model.User{Nickname: m["u"].Value.String(), Password: pwd}
+	u := model.User{Username: m["u"].Value.String(), Password: pwd}
 	// 序列化用户对象
 	ret, err := json.Marshal(u)
 	if err != nil {

@@ -21,8 +21,8 @@ func NewUserDAO(goDB *conn.GoDB) *UserDAO {
 
 // 插入新用户
 func (u *UserDAO) AddUser(user model.User) (int64, error) {
-	insertId, err := u.GoDB.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?, ?)",
-		nil, variable.IdWorker.GetId(), user.Nickname, user.Password, 0, "", time.Now(), time.Now())
+	insertId, err := u.GoDB.Insert("insert into user values(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		nil, variable.IdWorker.GetId(), user.Username, "", user.Password, 0, "", time.Now(), time.Now())
 	if err != nil {
 		return 0, err
 	}
@@ -33,9 +33,9 @@ func (u *UserDAO) AddUser(user model.User) (int64, error) {
 // 查询判断用户名，密码是否正确
 func (u *UserDAO) QueryUserByNamePass(user model.User) (bool, *model.User) {
 	// 查询
-	row := u.GoDB.QueryRow("select * from user where nickname=? && password=?", user.Nickname, user.Password)
+	row := u.GoDB.QueryRow("select * from user where username=? && password=?", user.Username, user.Password)
 
-	err := row.Scan(&user.Id, &user.UserId, &user.Nickname, &user.Password, &user.Gender, &user.Extra, &user.CreateTime, &user.UpdateTime)
+	err := row.Scan(&user.Id, &user.UserId, &user.Username, &user.Nickname, &user.Password, &user.Gender, &user.Extra, &user.CreateTime, &user.UpdateTime)
 	if err != nil {
 		//log.Info.Println("check user info err:", err)
 		return false, nil
