@@ -17,6 +17,12 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if LogoutCommand(m) {
 		// 登出命令
 		return constants.LogoutCommand
+	} else if SearchUsernameCommand(m) {
+		// 搜索用户名
+		return constants.SearchUsernameCommand
+	} else if SearchUserIdCommand(m) {
+		// 搜索用户 id
+		return constants.SearchUserIdCommand
 	}
 
 	// 无效命令
@@ -51,4 +57,26 @@ func LoginCommand(m map[string]*flag.Flag) bool {
 func LogoutCommand(m map[string]*flag.Flag) bool {
 	_, q := m["q"]
 	return q
+}
+
+// 搜索用户名命令
+func SearchUsernameCommand(m map[string]*flag.Flag) bool {
+	_, s := m["s"]
+	_, u := m["u"]
+
+	if s && u {
+		return true
+	}
+	return false
+}
+
+// 搜索用户名命令
+func SearchUserIdCommand(m map[string]*flag.Flag) bool {
+	_, s := m["s"]
+	_, n := m["n"]
+
+	if s && n {
+		return true
+	}
+	return false
 }

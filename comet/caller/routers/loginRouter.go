@@ -118,7 +118,7 @@ func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	ackPack := packet.NewServerAckPack(constants.LoginAckOpt, lr.success, loginMsg)
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
-		log.Info.Println("serialize logic ack pack object err:", err)
+		log.Info.Println("serialize login ack pack object err:", err)
 		return
 	}
 

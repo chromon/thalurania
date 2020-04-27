@@ -29,6 +29,7 @@ func NewCommand(name string) *Command {
 // 登出：tim -q
 // 搜索：tim -s -u 用户名
 // 		tim -s -n 用户 id
+// 		tim -s -g 用户组 id
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")

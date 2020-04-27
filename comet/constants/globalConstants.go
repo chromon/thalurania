@@ -13,6 +13,9 @@ const (
 
 	// 登出
 	LogoutOption = 103
+
+	// 搜索用户名
+	SearchOption = 104
 )
 
 // 数据持久化协议指令
@@ -34,6 +37,9 @@ const (
 
 	// 登出
 	LogoutAckOpt = 304
+
+	// 搜索
+	SearchAckOpt = 305
 )
 
 // 网络协议
@@ -61,4 +67,10 @@ const (
 
 	// 登出
 	LogoutCommand = 603
+
+	// 搜索用户名
+	SearchUsernameCommand = 604
+
+	// 搜索用户 id
+	SearchUserIdCommand = 605
 )

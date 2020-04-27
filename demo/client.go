@@ -7,6 +7,7 @@ import (
 	"chalurania/demo/client/commands"
 	"chalurania/demo/client/logic"
 	"chalurania/service/log"
+	"chalurania/service/model"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -64,6 +65,12 @@ func main() {
 			case constants.LogoutCommand:
 				// 登出命令
 				logic.Logout(conn)
+			case constants.SearchUsernameCommand:
+				// 通过用户名进行搜索
+				logic.Search(c.CommandMap, conn, constants.SearchUsernameCommand)
+			case constants.SearchUserIdCommand:
+				// 通过用户 id 进行搜索
+				logic.Search(c.CommandMap, conn, constants.SearchUserIdCommand)
 			}
 		}
 	}()
@@ -123,6 +130,17 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 						os.Exit(1)
+					}
+				case constants.SearchAckOpt:
+					if ackPack.Sign {
+						var user model.User
+						err = json.Unmarshal(ackPack.Data, &user)
+						if err != nil {
+							log.Error.Printf("unmarshal user err: %v\n", err)
+						}
+						fmt.Printf("\b\b%d - %s \n", user.UserId, user.Username)
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
 				}
 

@@ -58,6 +58,7 @@ func main() {
 	s.AddRouter(constants.SignUpOption, &routers.RegisterRouter{})
 	s.AddRouter(constants.LoginOption, &routers.LoginRouter{})
 	s.AddRouter(constants.LogoutOption, &routers.LogoutRouter{})
+	s.AddRouter(constants.SearchOption, &routers.SearchRouter{})
 
 	// 开启服务
 	s.Serve()

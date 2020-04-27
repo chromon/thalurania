@@ -43,3 +43,29 @@ func (u *UserDAO) QueryUserByNamePass(user model.User) (bool, *model.User) {
 
 	return true, &user
 }
+
+// 通过用户名查询用户
+func (u *UserDAO) QueryUserByName(user model.User) (bool, *model.User) {
+	// 查询
+	row := u.GoDB.QueryRow("select * from user where username=?", user.Username)
+
+	err := row.Scan(&user.Id, &user.UserId, &user.Username, &user.Nickname, &user.Password, &user.Gender, &user.Extra, &user.CreateTime, &user.UpdateTime)
+	if err != nil {
+		return false, nil
+	}
+
+	return true, &user
+}
+
+// 通过用户 id 查询用户
+func (u *UserDAO) QueryUserById(user model.User) (bool, *model.User) {
+	// 查询
+	row := u.GoDB.QueryRow("select * from user where user_id=?", user.UserId)
+
+	err := row.Scan(&user.Id, &user.UserId, &user.Username, &user.Nickname, &user.Password, &user.Gender, &user.Extra, &user.CreateTime, &user.UpdateTime)
+	if err != nil {
+		return false, nil
+	}
+
+	return true, &user
+}
