@@ -71,6 +71,12 @@ func main() {
 			case constants.SearchUserIdCommand:
 				// 通过用户 id 进行搜索
 				logic.Search(c.CommandMap, conn, constants.SearchUserIdCommand)
+			case constants.AddUserByNameCommand:
+				// 通过用户名添加好友
+				logic.FriendRequest(c.CommandMap, conn, constants.AddUserByNameCommand)
+			case constants.AddUserByIdCommand:
+				// 通过用户 id 添加好友
+				logic.FriendRequest(c.CommandMap, conn, constants.AddUserByIdCommand)
 			}
 		}
 	}()
@@ -83,7 +89,8 @@ func main() {
 			header := make([]byte, dp.GetHeaderLen())
 			_, err = io.ReadFull(conn, header)
 			if err != nil {
-				log.Error.Println("client read ack header err:", err)
+				fmt.Printf("\b\bcan not connect to remote server, ")
+				os.Exit(1)
 				return
 			}
 
@@ -138,10 +145,12 @@ func main() {
 						if err != nil {
 							log.Error.Printf("unmarshal user err: %v\n", err)
 						}
-						fmt.Printf("\b\b%d - %s \n", user.UserId, user.Username)
+						fmt.Printf("\b\b[id: %d, username: \"%s\", nickname: \"%s\"]\n", user.UserId, user.Username, user.Nickname)
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.FriendRequestAckOpt:
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Print("~ ")

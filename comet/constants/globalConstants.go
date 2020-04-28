@@ -16,12 +16,18 @@ const (
 
 	// 搜索用户名
 	SearchOption = 104
+
+	// 添加好友
+	FriendRequestOption = 105
 )
 
 // 数据持久化协议指令
 const (
 	// 注册信息
 	SignUpPersistenceOpt = 201
+
+	// 添加好友请求
+	FriendRequestPersistOpt = 202
 )
 
 // 回执信息指令
@@ -40,6 +46,9 @@ const (
 
 	// 搜索
 	SearchAckOpt = 305
+
+	// 添加好友请求
+	FriendRequestAckOpt = 306
 )
 
 // 网络协议
@@ -73,4 +82,10 @@ const (
 
 	// 搜索用户 id
 	SearchUserIdCommand = 605
+
+	// 通过用户名添加好友
+	AddUserByNameCommand = 606
+
+	// 通过用户 id 添加好友
+	AddUserByIdCommand = 607
 )

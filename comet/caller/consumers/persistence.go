@@ -30,6 +30,12 @@ func Consume(msg redis.Message) error {
 		if err != nil {
 			return err
 		}
+	case constants.FriendRequestPersistOpt:
+		// 插入新好友请求
+		err = insertFriendRequest(dw.Model)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -41,7 +47,7 @@ func insertUser(m []byte) error {
 	var u model.User
 	err := json.Unmarshal(m, &u)
 	if err != nil {
-		log.Error.Printf("unmarshal user err=%v\n", err)
+		log.Error.Printf("unmarshal user err: %v\n", err)
 	}
 	// 加密密码
 	u.Password = scrypt.Crypto(u.Password)
@@ -50,7 +56,26 @@ func insertUser(m []byte) error {
 	userDAO := dao.NewUserDAO(variable.GoDB)
 	_, err = userDAO.AddUser(u)
 	if err != nil {
-		return errors.New("insert user err")
+		return errors.New("insert user error")
+	}
+
+	return nil
+}
+
+// 插入新好友请求
+func insertFriendRequest(m []byte) error {
+	// json 解析 friend request 数据
+	var fr model.FriendRequest
+	err := json.Unmarshal(m, &fr)
+	if err != nil {
+		log.Error.Printf("unmarshal friend request err: %v\n", err)
+	}
+
+	// 添加好友请求
+	friendRequestDAO := dao.NewFriendRequestDAO(variable.GoDB)
+	_, err = friendRequestDAO.AddFriendRequest(fr)
+	if err != nil {
+		return errors.New("insert friend request error")
 	}
 
 	return nil

@@ -18,7 +18,7 @@ func OnConnectionStart(conn api.IConnection) {
 
 // 断开连接时执行
 func OnConnectionLost(conn api.IConnection) {
-	log.Info.Println("on connection lost called...")
+	//log.Info.Println("on connection lost called...")
 
 	// 获取属性
 	user, err := conn.GetProperty("user")
@@ -59,6 +59,7 @@ func main() {
 	s.AddRouter(constants.LoginOption, &routers.LoginRouter{})
 	s.AddRouter(constants.LogoutOption, &routers.LogoutRouter{})
 	s.AddRouter(constants.SearchOption, &routers.SearchRouter{})
+	s.AddRouter(constants.FriendRequestOption, &routers.FriendRequestRouter{})
 
 	// 开启服务
 	s.Serve()

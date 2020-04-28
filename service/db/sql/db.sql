@@ -21,6 +21,32 @@ CREATE TABLE `user`
   DEFAULT CHARSET = utf8mb4
   COMMENT = '用户';
 
+/* 好友请求表 */
+DROP TABLE IF EXISTS `friend_request`;
+CREATE TABLE IF NOT EXISTS friend_request (
+    `id`         bigint(20) NOT NULL AUTO_INCREMENT COMMENT '好友关系 Id（唯一标识）',
+    `user_id`    bigint(20) NOT NULL COMMENT '用户 Id',
+    `friend_id`  bigint(20) NOT NULL COMMENT '好友 Id',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`) USING BTREE,
+    KEY `idx_friend_id` (`friend_id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COMMENT = '好友请求';
+
+/* 好友关系表 */
+DROP TABLE IF EXISTS `friend`;
+CREATE TABLE IF NOT EXISTS friend (
+   `id`         bigint(20) NOT NULL AUTO_INCREMENT COMMENT '好友关系 Id（唯一标识）',
+   `user_id`    bigint(20) NOT NULL COMMENT '用户 Id',
+   `friend_id`  bigint(20) NOT NULL COMMENT '好友 Id',
+   PRIMARY KEY (`id`),
+   KEY `idx_user_id` (`user_id`) USING BTREE,
+   KEY `idx_friend_id` (`friend_id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COMMENT = '好友';
+
 /* 消息表 */
 DROP TABLE IF EXISTS `message`;
 CREATE TABLE `message`

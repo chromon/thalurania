@@ -23,6 +23,12 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if SearchUserIdCommand(m) {
 		// 搜索用户 id
 		return constants.SearchUserIdCommand
+	} else if AddFriendByNameCommand(m) {
+		// 通过用户名添加好友
+		return constants.AddUserByNameCommand
+	} else if AddFriendByIdCommand(m) {
+		// 通过用户 id 添加好友
+		return constants.AddUserByIdCommand
 	}
 
 	// 无效命令
@@ -76,6 +82,28 @@ func SearchUserIdCommand(m map[string]*flag.Flag) bool {
 	_, n := m["n"]
 
 	if s && n {
+		return true
+	}
+	return false
+}
+
+// 通过用户名添加好友
+func AddFriendByNameCommand(m map[string]*flag.Flag) bool {
+	_, add := m["add"]
+	_, u := m["u"]
+
+	if add && u {
+		return true
+	}
+	return false
+}
+
+// 通过用户名添加好友
+func AddFriendByIdCommand(m map[string]*flag.Flag) bool {
+	_, add := m["add"]
+	_, n := m["n"]
+
+	if add && n {
 		return true
 	}
 	return false
