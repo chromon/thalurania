@@ -10,6 +10,7 @@ import (
 	"chalurania/service/log"
 	"chalurania/service/model"
 	"encoding/json"
+	"strconv"
 )
 
 // 添加好友请求
@@ -74,6 +75,29 @@ func (fr *FriendRequestRouter) Handle(r api.IRequest) {
 				log.Error.Println("redis pool publish to async persistence err:", err)
 				return
 			}
+
+			// 将添加好友信息发送到对方 channel
+			// 好友信息序列化
+			fJson, err := json.Marshal(f)
+			if err != nil {
+				log.Info.Println("serialize friend object err:", err)
+			}
+
+			serverTransPack := packet.NewServerTransPack(constants.SendFriendRequest, fJson)
+			re, err := json.Marshal(serverTransPack)
+			if err != nil {
+				log.Info.Println("serialize server trans pack (send friend request) object err:", err)
+				return
+			}
+
+			// publish 消息(pack)通知好友请求
+			chanName := "UserChannel:" + strconv.FormatInt(f.UserId,10)
+			_, err = variable.RedisPool.Publish(chanName, string(re))
+			if err != nil {
+				log.Error.Println("redis pool publish to user channel err:", err)
+				return
+			}
+
 			fr.success = true
 		} else {
 			fr.success = false
@@ -106,6 +130,29 @@ func (fr *FriendRequestRouter) Handle(r api.IRequest) {
 				log.Error.Println("redis pool publish to async persistence err:", err)
 				return
 			}
+
+			// 将添加好友信息发送到对方 channel
+			// 好友信息序列化
+			fJson, err := json.Marshal(f)
+			if err != nil {
+				log.Info.Println("serialize friend object err:", err)
+			}
+
+			serverTransPack := packet.NewServerTransPack(constants.SendFriendRequest, fJson)
+			re, err := json.Marshal(serverTransPack)
+			if err != nil {
+				log.Info.Println("serialize server trans pack (send friend request) object err:", err)
+				return
+			}
+
+			// publish 消息(pack)通知好友请求
+			chanName := "UserChannel:" + strconv.FormatInt(f.UserId,10)
+			_, err = variable.RedisPool.Publish(chanName, string(re))
+			if err != nil {
+				log.Error.Println("redis pool publish to user channel err:", err)
+				return
+			}
+			
 			fr.success = true
 		} else {
 			fr.success = false

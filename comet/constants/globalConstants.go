@@ -61,6 +61,9 @@ const (
 const (
 	// 强制下线
 	KickOut = 501
+
+	// 发送好友请求
+	SendFriendRequest = 502
 )
 
 // 客户端命令

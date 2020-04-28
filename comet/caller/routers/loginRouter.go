@@ -69,7 +69,7 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 			// publish 消息(pack)告诉另一个连接下线
 			_, err = variable.RedisPool.Publish(chanName, string(ret))
 			if err != nil {
-				log.Error.Println("redis pool publish to async persistence err:", err)
+				log.Error.Println("redis pool publish to user channel err:", err)
 				return
 			}
 		}

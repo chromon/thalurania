@@ -1,6 +1,7 @@
 package consumers
 
 import (
+	"bytes"
 	"chalurania/api"
 	"chalurania/comet/constants"
 	"chalurania/comet/packet"
@@ -8,6 +9,7 @@ import (
 	"chalurania/service/model"
 	"encoding/json"
 	"github.com/gomodule/redigo/redis"
+	"strconv"
 )
 
 // 处理 channel 订阅到的信息
@@ -40,6 +42,23 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 		case constants.KickOut:
 			// 踢人，迫使另一设备下线
 			ackPack = packet.NewServerAckPack(constants.DeviceOffline, true, stp.Data)
+		case constants.SendFriendRequest:
+			// 发送添加好友信息
+			var friend model.User
+			err = json.Unmarshal(stp.Data, &friend)
+			if err != nil {
+				log.Error.Printf("unmarshal ack pack err: %v\n", err)
+			}
+
+			// 拼接通知信息
+			var bt bytes.Buffer
+			bt.WriteString("[NEW] friend request from ")
+			bt.WriteString(friend.Username)
+			bt.WriteString(" (")
+			bt.WriteString(strconv.FormatInt(friend.UserId,10))
+			bt.WriteString(")")
+
+			ackPack = packet.NewServerAckPack(constants.FriendRequestAckOpt, true, []byte(bt.String()))
 		}
 
 		// 序列化 ack 并向客户端发送
