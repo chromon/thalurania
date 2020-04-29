@@ -19,6 +19,12 @@ const (
 
 	// 添加好友
 	FriendRequestOption = 105
+
+	// 好友请求列表
+	FriendReqListOption = 106
+
+	// 接受好友请求
+	AcceptFriendOption = 107
 )
 
 // 数据持久化协议指令
@@ -49,6 +55,9 @@ const (
 
 	// 添加好友请求
 	FriendRequestAckOpt = 306
+
+	// 好友请求列表
+	FriendReqListAckOpt = 307
 )
 
 // 网络协议
@@ -91,4 +100,13 @@ const (
 
 	// 通过用户 id 添加好友
 	AddUserByIdCommand = 607
+
+	// 好友请求列表
+	FriendReqListCommand = 608
+
+	// 通过用户名接受好友请求
+	AcceptFriendByNameCommand = 609
+
+	// 通过用户 id 接受好友请求
+	AcceptFriendByIdCommand = 610
 )

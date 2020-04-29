@@ -29,6 +29,15 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if AddFriendByIdCommand(m) {
 		// 通过用户 id 添加好友
 		return constants.AddUserByIdCommand
+	} else if FriReqListCommand(m) {
+		// 好友请求列表
+		return constants.FriendReqListCommand
+	} else if AcceptFriendByNameCommand(m) {
+		// 通过用户名接受好友请求
+		return constants.AcceptFriendByNameCommand
+	} else if AcceptFriendByIdCommand(m) {
+		// 通过用户 id 接受好友请求
+		return constants.AcceptFriendByIdCommand
 	}
 
 	// 无效命令
@@ -104,6 +113,39 @@ func AddFriendByIdCommand(m map[string]*flag.Flag) bool {
 	_, n := m["n"]
 
 	if add && n {
+		return true
+	}
+	return false
+}
+
+// 好友请求列表
+func FriReqListCommand(m map[string]*flag.Flag) bool {
+	_, fr := m["req"]
+	_, list := m["list"]
+
+	if fr && list {
+		return true
+	}
+	return false
+}
+
+// 通过用户名接受好友请求
+func AcceptFriendByNameCommand(m map[string]*flag.Flag) bool {
+	_, accept := m["accept"]
+	_, u := m["u"]
+
+	if accept && u {
+		return true
+	}
+	return false
+}
+
+// 通过用户 id 接受好友请求
+func AcceptFriendByIdCommand(m map[string]*flag.Flag) bool {
+	_, accept := m["accept"]
+	_, n := m["n"]
+
+	if accept && n {
 		return true
 	}
 	return false

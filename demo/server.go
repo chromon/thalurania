@@ -23,7 +23,6 @@ func OnConnectionLost(conn api.IConnection) {
 	// 获取属性
 	user, err := conn.GetProperty("user")
 	if err != nil {
-		log.Error.Println("conn get user property err:", err)
 		return
 	}
 
@@ -60,6 +59,7 @@ func main() {
 	s.AddRouter(constants.LogoutOption, &routers.LogoutRouter{})
 	s.AddRouter(constants.SearchOption, &routers.SearchRouter{})
 	s.AddRouter(constants.FriendRequestOption, &routers.FriendRequestRouter{})
+	s.AddRouter(constants.FriendReqListOption, &routers.FriendReqListRouter{})
 
 	// 开启服务
 	s.Serve()

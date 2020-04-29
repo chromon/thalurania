@@ -152,7 +152,7 @@ func (fr *FriendRequestRouter) Handle(r api.IRequest) {
 				log.Error.Println("redis pool publish to user channel err:", err)
 				return
 			}
-			
+
 			fr.success = true
 		} else {
 			fr.success = false

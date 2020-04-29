@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS friend_request (
     `id`         bigint(20) NOT NULL AUTO_INCREMENT COMMENT '好友关系 Id（唯一标识）',
     `user_id`    bigint(20) NOT NULL COMMENT '用户 Id',
     `friend_id`  bigint(20) NOT NULL COMMENT '好友 Id',
+    `del`        tinyint(4) NOT NULL COMMENT '是否已删除 0：否，1：是',
     PRIMARY KEY (`id`),
     KEY `idx_user_id` (`user_id`) USING BTREE,
     KEY `idx_friend_id` (`friend_id`) USING BTREE

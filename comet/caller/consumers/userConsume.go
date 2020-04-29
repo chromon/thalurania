@@ -52,7 +52,7 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 
 			// 拼接通知信息
 			var bt bytes.Buffer
-			bt.WriteString("[NEW] friend request from ")
+			bt.WriteString("[NEW] friend request from: ")
 			bt.WriteString(friend.Username)
 			bt.WriteString(" (")
 			bt.WriteString(strconv.FormatInt(friend.UserId,10))

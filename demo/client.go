@@ -77,6 +77,15 @@ func main() {
 			case constants.AddUserByIdCommand:
 				// 通过用户 id 添加好友
 				logic.FriendRequest(c.CommandMap, conn, constants.AddUserByIdCommand)
+			case constants.FriendReqListCommand:
+				// 好友请求列表
+				logic.FriendReqList(conn)
+			case constants.AcceptFriendByNameCommand:
+				// 通过用户名接受好友请求
+				logic.AcceptFriend(c.CommandMap, conn, constants.AcceptFriendByNameCommand)
+			case constants.AcceptFriendByIdCommand:
+				// 通过用户 id 接受好友请求
+				logic.AcceptFriend(c.CommandMap, conn, constants.AcceptFriendByIdCommand)
 			}
 		}
 	}()
@@ -89,7 +98,7 @@ func main() {
 			header := make([]byte, dp.GetHeaderLen())
 			_, err = io.ReadFull(conn, header)
 			if err != nil {
-				fmt.Printf("\b\bcan not connect to remote server, ")
+				fmt.Printf("\b\blost connect from remote server, ")
 				os.Exit(1)
 				return
 			}
@@ -151,6 +160,38 @@ func main() {
 					}
 				case constants.FriendRequestAckOpt:
 					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.FriendReqListAckOpt:
+					if ackPack.Sign {
+						var frArray [2][]byte
+						err = json.Unmarshal(ackPack.Data, &frArray)
+						if err != nil {
+							log.Error.Printf("unmarshal friend request list err: %v\n", err)
+						}
+
+						fmt.Printf("\b\bfriend request to: \n")
+						var sentFrMap map[string][]byte
+						err = json.Unmarshal(frArray[0], &sentFrMap)
+						for _, value := range sentFrMap {
+							var u model.User
+							err = json.Unmarshal(value, &u)
+
+							fmt.Println("\t", u.Username, "(", u.UserId, ")")
+						}
+
+						fmt.Printf("\b\bfriend request from: \n")
+						var receivedFrMap map[string][]byte
+						err = json.Unmarshal(frArray[1], &receivedFrMap)
+						for _, value := range receivedFrMap {
+							var u model.User
+							err = json.Unmarshal(value, &u)
+
+							fmt.Println("\t", u.Username, "(", u.UserId, ")")
+						}
+
+
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				}
 
 				fmt.Print("~ ")
