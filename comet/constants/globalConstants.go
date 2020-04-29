@@ -58,6 +58,9 @@ const (
 
 	// 好友请求列表
 	FriendReqListAckOpt = 307
+
+	// 接受好友请求
+	AcceptFriendRepAckOpt = 308
 )
 
 // 网络协议

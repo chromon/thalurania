@@ -140,6 +140,7 @@ func main() {
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 					os.Exit(0)
 				case constants.LogoutAckOpt:
+					// 登出
 					if ackPack.Sign {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 						os.Exit(0)
@@ -148,6 +149,7 @@ func main() {
 						os.Exit(1)
 					}
 				case constants.SearchAckOpt:
+					// 搜索
 					if ackPack.Sign {
 						var user model.User
 						err = json.Unmarshal(ackPack.Data, &user)
@@ -159,8 +161,10 @@ func main() {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
 				case constants.FriendRequestAckOpt:
+					// 添加好友请求
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.FriendReqListAckOpt:
+					// 好友请求列表
 					if ackPack.Sign {
 						var frArray [2][]byte
 						err = json.Unmarshal(ackPack.Data, &frArray)
@@ -168,30 +172,30 @@ func main() {
 							log.Error.Printf("unmarshal friend request list err: %v\n", err)
 						}
 
-						fmt.Printf("\b\bfriend request to: \n")
+						fmt.Printf("\b\b  friend request to: \n")
 						var sentFrMap map[string][]byte
 						err = json.Unmarshal(frArray[0], &sentFrMap)
 						for _, value := range sentFrMap {
 							var u model.User
 							err = json.Unmarshal(value, &u)
 
-							fmt.Println("\t", u.Username, "(", u.UserId, ")")
+							fmt.Println("    ", u.Username, "(", u.UserId, ")")
 						}
 
-						fmt.Printf("\b\bfriend request from: \n")
+						fmt.Printf("\b\b  friend request from: \n")
 						var receivedFrMap map[string][]byte
 						err = json.Unmarshal(frArray[1], &receivedFrMap)
 						for _, value := range receivedFrMap {
 							var u model.User
 							err = json.Unmarshal(value, &u)
 
-							fmt.Println("\t", u.Username, "(", u.UserId, ")")
+							fmt.Println("    ", u.Username, "(", u.UserId, ")")
 						}
-
-
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.AcceptFriendRepAckOpt:
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Print("~ ")
