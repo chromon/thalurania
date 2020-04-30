@@ -86,6 +86,9 @@ func main() {
 			case constants.AcceptFriendByIdCommand:
 				// 通过用户 id 接受好友请求
 				logic.AcceptFriend(c.CommandMap, conn, constants.AcceptFriendByIdCommand)
+			case constants.FriendListCommand:
+				// 好友列表
+				logic.FriendList(conn)
 			}
 		}
 	}()
@@ -106,7 +109,7 @@ func main() {
 			// 将服务端返回的 ack header 信息拆包
 			_, _, receiveMsg, err := dp.Unpack(header)
 			if err != nil {
-				log.Error.Println("unpack data header err:", err)
+				fmt.Println("unpack data header err:", err)
 				return
 			}
 
@@ -117,7 +120,7 @@ func main() {
 				// 读取消息内容
 				_, err := io.ReadFull(conn, msg.Data)
 				if err != nil {
-					log.Error.Println("client unpack data err:", err)
+					fmt.Println("client unpack data err:", err)
 					return
 				}
 
@@ -125,7 +128,7 @@ func main() {
 				var ackPack packet.ServerAckPack
 				err = json.Unmarshal(msg.Data, &ackPack)
 				if err != nil {
-					log.Error.Printf("unmarshal ack pack err=%v\n", err)
+					fmt.Printf("unmarshal ack pack err=%v\n", err)
 				}
 
 				switch ackPack.Opt {
@@ -154,7 +157,7 @@ func main() {
 						var user model.User
 						err = json.Unmarshal(ackPack.Data, &user)
 						if err != nil {
-							log.Error.Printf("unmarshal user err: %v\n", err)
+							fmt.Printf("unmarshal user err: %v\n", err)
 						}
 						fmt.Printf("\b\b[id: %d, username: \"%s\", nickname: \"%s\"]\n", user.UserId, user.Username, user.Nickname)
 					} else {
@@ -169,7 +172,7 @@ func main() {
 						var frArray [2][]byte
 						err = json.Unmarshal(ackPack.Data, &frArray)
 						if err != nil {
-							log.Error.Printf("unmarshal friend request list err: %v\n", err)
+							fmt.Printf("unmarshal friend request list err: %v\n", err)
 						}
 
 						fmt.Printf("\b\b  friend request to: \n")
@@ -195,7 +198,27 @@ func main() {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
 				case constants.AcceptFriendRepAckOpt:
+					// 接受好友请求
 					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.FriendListAckOpt:
+					// 好友列表
+					if ackPack.Sign {
+						var friendMap map[string][]byte
+						err = json.Unmarshal(ackPack.Data, &friendMap)
+						if err != nil {
+							fmt.Printf("unmarshal friend map err: %v\n", err)
+						}
+
+						fmt.Printf("\b\b  friend list: \n")
+						for _, value := range friendMap {
+							var u model.User
+							err = json.Unmarshal(value, &u)
+
+							fmt.Println("    ", u.Username, "(", u.UserId, ")")
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				}
 
 				fmt.Print("~ ")

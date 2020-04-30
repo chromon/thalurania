@@ -61,6 +61,7 @@ func main() {
 	s.AddRouter(constants.FriendRequestOption, &routers.FriendRequestRouter{})
 	s.AddRouter(constants.FriendReqListOption, &routers.FriendReqListRouter{})
 	s.AddRouter(constants.AcceptFriendOption, &routers.AcceptFriendRouter{})
+	s.AddRouter(constants.FriendListOption, &routers.FriendListRouter{})
 
 	// 开启服务
 	s.Serve()

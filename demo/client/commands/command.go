@@ -35,6 +35,7 @@ func NewCommand(name string) *Command {
 // 好友请求列表：tim -fr -list
 // 接受好友请求：tim -accept -u 用户名
 //			   tim -accept -n 用户 id
+// 好友列表：tim -f -list
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -58,6 +59,8 @@ func (c *Command) CommandInit() {
 	c.FlagSet.Bool("list", false, "list")
 	// 接受好友请求
 	c.FlagSet.Bool("accept", false, "accept request")
+	// 好友
+	c.FlagSet.Bool("f", false, "friend")
 }
 
 // 解析命令

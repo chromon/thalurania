@@ -4,6 +4,7 @@ import (
 	"chalurania/service/db/conn"
 	"chalurania/service/log"
 	"chalurania/service/model"
+	"database/sql"
 )
 
 // 好友数据访问对象
@@ -28,4 +29,11 @@ func (u *FriendDAO) AddFriend(f model.Friend) int64 {
 	}
 
 	return insertId
+}
+
+// 查询接收到的好友请求
+func (u *FriendDAO) QueryFriend(user model.User) (*sql.Rows, error) {
+	// 查询
+	rows, err := u.GoDB.Query("select friend_id from friend where user_id=?", user.UserId)
+	return rows, err
 }
