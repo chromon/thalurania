@@ -36,6 +36,8 @@ func NewCommand(name string) *Command {
 // 接受好友请求：tim -accept -u 用户名
 //			   tim -accept -n 用户 id
 // 好友列表：tim -f -list
+// 与好友聊天：tim -chat -u 用户名 -m 消息内容
+// 			 tim -chat -n 用户 id -m 消息内容
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -61,6 +63,10 @@ func (c *Command) CommandInit() {
 	c.FlagSet.Bool("accept", false, "accept request")
 	// 好友
 	c.FlagSet.Bool("f", false, "friend")
+	// 聊天
+	c.FlagSet.Bool("chat", false, "chat with friend or group")
+	// 消息内容
+	c.FlagSet.String("m", "", "message")
 }
 
 // 解析命令

@@ -11,9 +11,6 @@ type Message struct {
 	// 消息序列号
 	Seq int64 `json:"seq"`
 
-	// 消息类型
-	MessageType int32 `json:"type"`
-
 	// 消息内容
 	Content string `json:"content"`
 

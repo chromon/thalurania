@@ -47,7 +47,7 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 			var friend model.User
 			err = json.Unmarshal(stp.Data, &friend)
 			if err != nil {
-				log.Error.Printf("unmarshal ack pack err: %v\n", err)
+				log.Error.Printf("unmarshal stp pack err: %v\n", err)
 			}
 
 			// 拼接通知信息
@@ -59,6 +59,9 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 			bt.WriteString(")")
 
 			ackPack = packet.NewServerAckPack(constants.FriendRequestAckOpt, true, []byte(bt.String()))
+		case constants.SendMessage:
+			// 向好友发送消息
+			ackPack = packet.NewServerAckPack(constants.SendMessageAckOpt, true, stp.Data)
 		}
 
 		// 序列化 ack 并向客户端发送

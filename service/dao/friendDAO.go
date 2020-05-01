@@ -37,3 +37,19 @@ func (u *FriendDAO) QueryFriend(user model.User) (*sql.Rows, error) {
 	rows, err := u.GoDB.Query("select friend_id from friend where user_id=?", user.UserId)
 	return rows, err
 }
+
+// 查询双方是否是好友
+func (u *FriendDAO) QueryFriendById(user, friend model.User) bool {
+	// 查询
+	row := u.GoDB.QueryRow("select * from friend where user_id=? && friend_id=?", user.UserId, friend.UserId)
+
+	var friendship model.Friend
+
+	err := row.Scan(&friendship.Id, &friendship.UserId, &friendship.FriendId)
+	if err != nil {
+		log.Error.Println("query friend err:", err)
+		return false
+	}
+
+	return true
+}

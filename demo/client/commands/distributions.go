@@ -41,6 +41,12 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if FriendListCommand(m) {
 		// 好友列表
 		return constants.FriendListCommand
+	} else if ChatWithFriendByNameCommand(m) {
+		// 通过用户名与好友私聊
+		return constants.ChatWithFriendByNameCommand
+	} else if ChatWithFriendByIdCommand(m) {
+		// 通过用户 id 与好友私聊
+		return constants.ChatWithFriendByIdCommand
 	}
 
 	// 无效命令
@@ -160,6 +166,30 @@ func FriendListCommand(m map[string]*flag.Flag) bool {
 	_, list := m["list"]
 
 	if f && list {
+		return true
+	}
+	return false
+}
+
+// 通过用户名私聊
+func ChatWithFriendByNameCommand(m map[string]*flag.Flag) bool {
+	_, chat := m["chat"]
+	_, u := m["u"]
+	_, msg := m["m"]
+
+	if chat && u && msg {
+		return true
+	}
+	return false
+}
+
+// 通过用户 id 私聊
+func ChatWithFriendByIdCommand(m map[string]*flag.Flag) bool {
+	_, chat := m["chat"]
+	_, n := m["n"]
+	_, msg := m["m"]
+
+	if chat && n && msg {
 		return true
 	}
 	return false

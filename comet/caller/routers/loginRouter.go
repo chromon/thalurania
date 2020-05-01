@@ -54,7 +54,7 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 		// 用户频道名定义：key - "user:用户id"，field - channel， value - "UserChannel：用户id"
 		res, err := redisConn.Do("hget", "user:" + strconv.FormatInt(user.UserId, 10), "channel")
 		if err != nil {
-			log.Error.Println("redis hash set user info err:", err)
+			log.Error.Println("redis hash get user info err:", err)
 		}
 
 		if res != nil {

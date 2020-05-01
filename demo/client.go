@@ -89,6 +89,12 @@ func main() {
 			case constants.FriendListCommand:
 				// 好友列表
 				logic.FriendList(conn)
+			case constants.ChatWithFriendByNameCommand:
+				// 通过好友用户名聊天
+				logic.PrivateChat(c.CommandMap, conn, constants.ChatWithFriendByNameCommand)
+			case constants.ChatWithFriendByIdCommand:
+				// 通过好友用户 id 聊天
+				logic.PrivateChat(c.CommandMap, conn, constants.ChatWithFriendByIdCommand)
 			}
 		}
 	}()
@@ -219,6 +225,9 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.SendMessageAckOpt:
+					// 发送消息
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Print("~ ")

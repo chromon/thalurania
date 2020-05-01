@@ -28,6 +28,9 @@ const (
 
 	// 好友列表
 	FriendListOption = 108
+
+	// 私聊
+	PrivateChatOption = 109
 )
 
 // 数据持久化协议指令
@@ -37,6 +40,9 @@ const (
 
 	// 添加好友请求
 	FriendRequestPersistOpt = 202
+
+	// 添加消息
+	MessagePersistenceOpt = 203
 )
 
 // 回执信息指令
@@ -67,6 +73,9 @@ const (
 
 	// 好友列表
 	FriendListAckOpt = 309
+
+	// 发送消息
+	SendMessageAckOpt = 310
 )
 
 // 网络协议
@@ -82,6 +91,9 @@ const (
 
 	// 发送好友请求
 	SendFriendRequest = 502
+
+	// 发送消息
+	SendMessage = 503
 )
 
 // 客户端命令
@@ -121,4 +133,10 @@ const (
 
 	// 好友列表
 	FriendListCommand = 611
+
+	// 通过用户名与好友私聊
+	ChatWithFriendByNameCommand = 612
+
+	// 通过用户 id 与好友私聊
+	ChatWithFriendByIdCommand = 613
 )

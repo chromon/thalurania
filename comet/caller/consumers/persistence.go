@@ -36,6 +36,12 @@ func Consume(msg redis.Message) error {
 		if err != nil {
 			return err
 		}
+	case constants.MessagePersistenceOpt:
+		// 插入新消息
+		err = insertMessage(dw.Model)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -76,6 +82,26 @@ func insertFriendRequest(m []byte) error {
 	_, err = friendRequestDAO.AddFriendRequest(fr)
 	if err != nil {
 		return errors.New("insert friend request error")
+	}
+
+	return nil
+}
+
+
+// 插入新消息
+func insertMessage(m []byte) error {
+	// json 解析 message 数据
+	var msg model.Message
+	err := json.Unmarshal(m, &msg)
+	if err != nil {
+		log.Error.Printf("unmarshal message err: %v\n", err)
+	}
+
+	// 添加消息
+	messageDAO := dao.NewMessageDAO(variable.GoDB)
+	_, err = messageDAO.AddMessage(msg)
+	if err != nil {
+		return errors.New("insert message error")
 	}
 
 	return nil
