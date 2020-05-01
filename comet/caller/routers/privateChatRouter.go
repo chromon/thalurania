@@ -142,7 +142,31 @@ func (pc *PrivateChatRouter) Handle(r api.IRequest) {
 		}
 	} else {
 		// 好友离线，存储离线消息
+		// 存储消息（将消息置为未读状态）
+		message := model.Message{Seq: r.GetMsgID(), Content: f.Extra, MessageTypeId: 1, SenderType: 1, SenderId: u.UserId,
+			ReceiverType: 1, ReceiverId: f.UserId, SendTime: time.Now(), Status: 1, CreateTime: time.Now(), UpdateTime: time.Now()}
+		// 序列化消息
+		msgJson, err := json.Marshal(message)
+		if err != nil {
+			log.Info.Println("serialize message object err:", err)
+			return
+		}
+		// 将信息包装并序列化
+		dw := packet.NewDataPersistWrap(constants.MessagePersistenceOpt, msgJson)
+		dwJson, err := json.Marshal(dw)
+		if err != nil {
+			log.Info.Println("serialize message data wrap object err:", err)
+			return
+		}
 
+		// 将序列化后的信息发布到异步存储管道
+		go func(){
+			_, err = variable.RedisPool.Publish("AsyncPersistence", string(dwJson))
+			if err != nil {
+				log.Error.Println("redis pool publish to async persistence err:", err)
+				return
+			}
+		}()
 	}
 
 	pc.msg = []byte("send message success")
