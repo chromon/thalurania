@@ -143,7 +143,18 @@ func main() {
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.LoginAckOpt:
 					// 登录
-					fmt.Printf("\b\b%s \n", ackPack.Data)
+					if ackPack.Sign {
+						var offlineMsgMap map[string]string
+						err = json.Unmarshal(ackPack.Data, &offlineMsgMap)
+						fmt.Println(offlineMsgMap)
+						if len(offlineMsgMap) > 0 {
+							for key, value := range offlineMsgMap {
+								fmt.Printf("\b\b[offline]you have %s unread messages from %s\n", value, key)
+							}
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				case constants.DeviceOffline:
 					// 被动离线
 					fmt.Printf("\b\b%s \n", ackPack.Data)

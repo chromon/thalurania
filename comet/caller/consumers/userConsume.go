@@ -62,6 +62,9 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 		case constants.SendMessage:
 			// 向好友发送消息
 			ackPack = packet.NewServerAckPack(constants.SendMessageAckOpt, true, stp.Data)
+		case constants.LoginSuccess:
+			// 向用户发送登录成功消息，使用 false 表明直接显示信息，不需要解析
+			ackPack = packet.NewServerAckPack(constants.SendMessageAckOpt, false, stp.Data)
 		}
 
 		// 序列化 ack 并向客户端发送

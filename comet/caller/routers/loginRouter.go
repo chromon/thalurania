@@ -20,6 +20,7 @@ import (
 type LoginRouter struct {
 	router.Router
 	success bool
+	offlineMsgMap map[string]string
 }
 
 // 登录处理
@@ -98,6 +99,55 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 
 		// 保存当前登录用户属性到连接中
 		r.GetConnection().SetProperty("user", user)
+
+		// 向用户发送登录成功消息
+		serverTransPack := packet.NewServerTransPack(constants.LoginSuccess, []byte("login success, now you can get your message"))
+		ret, err := json.Marshal(serverTransPack)
+		if err != nil {
+			log.Info.Println("serialize server trans pack (login) object err:", err)
+			return
+		}
+		// publish 消息(pack) 登录成功
+		_, err = variable.RedisPool.Publish(chanName, string(ret))
+		if err != nil {
+			log.Error.Println("redis pool publish to user channel err:", err)
+			return
+		}
+
+		// 查询用户好友
+		friendDAO := dao.NewFriendDAO(variable.GoDB)
+		rows, err := friendDAO.QueryFriend(*user)
+		defer func() {
+			if err = rows.Close(); err != nil {
+				panic(err)
+			}
+		}()
+		if err != nil {
+			lr.success = false
+			log.Error.Println("query friend err:", err)
+			return
+		}
+		// 遍历用户好友，查询是否有离线消息
+		messageDAO := dao.NewMessageDAO(variable.GoDB)
+		lr.offlineMsgMap = make(map[string]string)
+		for rows.Next() {
+			var friend model.User
+			err = rows.Scan(&friend.UserId)
+			if err != nil {
+				lr.success = false
+				log.Error.Println("scan friend id err:", err)
+				return
+			}
+
+			// 由好友 id 查询好友信息并序列化
+			_, f := userDAO.QueryUserById(friend)
+			count := messageDAO.QueryOfflineMsgCount(*user, *f)
+			if count > 0 {
+				// 与当前好友间存在离线消息
+				key := "<" + f.Username + "> (" + strconv.FormatInt(f.UserId, 10) + ")"
+				lr.offlineMsgMap[key] = strconv.FormatInt(count, 10)
+			}
+		}
 	} else {
 		// 登录失败
 		lr.success = false
@@ -108,9 +158,13 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 func (lr *LoginRouter) PostHandle(r api.IRequest) {
 	// 反向客户端发送 ack 数据
 	var loginMsg []byte
-	if lr.success {
-		loginMsg = []byte("login success, now you can get your message")
-	} else {
+	if lr.success && len(lr.offlineMsgMap) > 0 {
+		ret, err := json.Marshal(lr.offlineMsgMap)
+		if err != nil {
+			log.Info.Println("serialize offline message map object err:", err)
+		}
+		loginMsg = ret
+	} else if !lr.success {
 		loginMsg = []byte("login failed, please check your username or password")
 	}
 

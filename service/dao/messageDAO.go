@@ -2,6 +2,7 @@ package dao
 
 import (
 	"chalurania/service/db/conn"
+	"chalurania/service/log"
 	"chalurania/service/model"
 )
 
@@ -27,4 +28,16 @@ func (u *MessageDAO) AddMessage(m model.Message) (int64, error) {
 	}
 
 	return insertId, nil
+}
+
+// 查询未读消息数量
+func (u *MessageDAO) QueryOfflineMsgCount(user, friend model.User) int64 {
+	// 查询
+	var count int64
+	err := u.GoDB.QueryRow("select count(*) from message where sender_id=? and receiver_id=? and status=1", user.UserId, friend.UserId).Scan(&count)
+	if err != nil {
+		log.Error.Println("query offline message count err:", err)
+		return 0
+	}
+	return count
 }

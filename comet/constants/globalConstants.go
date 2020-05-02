@@ -94,6 +94,9 @@ const (
 
 	// 发送消息
 	SendMessage = 503
+
+	// 登录成功
+	LoginSuccess = 504
 )
 
 // 客户端命令
