@@ -266,7 +266,7 @@ func main() {
 					}
 				}
 
-				fmt.Print("~ ")
+				fmt.Printf("\b\b~ ")
 			}
 		}
 	}()

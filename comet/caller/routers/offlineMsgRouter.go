@@ -116,6 +116,10 @@ func (or *OfflineMsgRouter) Handle(r api.IRequest) {
 		}
 
 		offlineMsgMap[strconv.FormatInt(om.Seq, 10)] = omJson
+
+		// 更新离线消息状态
+		om.Status = 2
+		messageDAO.UpdateMessage(om)
 	}
 
 	mapJson, err := json.Marshal(offlineMsgMap)
