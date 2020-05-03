@@ -63,6 +63,7 @@ func main() {
 	s.AddRouter(constants.AcceptFriendOption, &routers.AcceptFriendRouter{})
 	s.AddRouter(constants.FriendListOption, &routers.FriendListRouter{})
 	s.AddRouter(constants.PrivateChatOption, &routers.PrivateChatRouter{})
+	s.AddRouter(constants.OfflineMessageOption, &routers.OfflineMsgRouter{})
 
 	// 开启服务
 	s.Serve()

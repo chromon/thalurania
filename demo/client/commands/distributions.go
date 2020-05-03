@@ -47,6 +47,12 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if ChatWithFriendByIdCommand(m) {
 		// 通过用户 id 与好友私聊
 		return constants.ChatWithFriendByIdCommand
+	} else if OfflineMsgByNameCommand(m) {
+		// 通过用户名查询离线消息
+		return constants.OfflineMsgByNameCommand
+	} else if OfflineMsgByIdCommand(m) {
+		// 通过用户 id 查询离线消息
+		return constants.OfflineMsgByIdCommand
 	}
 
 	// 无效命令
@@ -190,6 +196,28 @@ func ChatWithFriendByIdCommand(m map[string]*flag.Flag) bool {
 	_, msg := m["m"]
 
 	if chat && n && msg {
+		return true
+	}
+	return false
+}
+
+// 通过用户名查询离线消息
+func OfflineMsgByNameCommand(m map[string]*flag.Flag) bool {
+	_, o := m["o"]
+	_, u := m["u"]
+
+	if o && u {
+		return true
+	}
+	return false
+}
+
+// 通过用户 id 查询离线消息
+func OfflineMsgByIdCommand(m map[string]*flag.Flag) bool {
+	_, o := m["o"]
+	_, n := m["n"]
+
+	if o && n {
 		return true
 	}
 	return false

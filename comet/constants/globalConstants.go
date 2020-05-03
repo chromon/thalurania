@@ -31,6 +31,9 @@ const (
 
 	// 私聊
 	PrivateChatOption = 109
+
+	// 离线消息
+	OfflineMessageOption = 110
 )
 
 // 数据持久化协议指令
@@ -76,6 +79,9 @@ const (
 
 	// 发送消息
 	SendMessageAckOpt = 310
+
+	// 离线消息
+	OfflineMsgAckOpt = 311
 )
 
 // 网络协议
@@ -142,4 +148,10 @@ const (
 
 	// 通过用户 id 与好友私聊
 	ChatWithFriendByIdCommand = 613
+
+	// 通过用户名查询离线消息
+	OfflineMsgByNameCommand = 615
+
+	// 通过用户 id 查询离线消息
+	OfflineMsgByIdCommand = 616
 )

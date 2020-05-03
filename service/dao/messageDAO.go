@@ -4,6 +4,7 @@ import (
 	"chalurania/service/db/conn"
 	"chalurania/service/log"
 	"chalurania/service/model"
+	"database/sql"
 )
 
 // 消息数据访问对象
@@ -40,4 +41,11 @@ func (u *MessageDAO) QueryOfflineMsgCount(user, friend model.User) int64 {
 		return 0
 	}
 	return count
+}
+
+// 查询未读消息
+func (u *MessageDAO) QueryOfflineMessage(user, friend model.User) (*sql.Rows, error) {
+	// 查询
+	rows, err := u.GoDB.Query("select * from message where sender_id=? and receiver_id=? and status=1", user.UserId, friend.UserId)
+	return rows, err
 }

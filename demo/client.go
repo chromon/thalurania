@@ -95,6 +95,12 @@ func main() {
 			case constants.ChatWithFriendByIdCommand:
 				// 通过好友用户 id 聊天
 				logic.PrivateChat(c.CommandMap, conn, constants.ChatWithFriendByIdCommand)
+			case constants.OfflineMsgByNameCommand:
+				// 通过用户名查询离线消息
+				logic.OfflineMessage(c.CommandMap, conn, constants.OfflineMsgByNameCommand)
+			case constants.OfflineMsgByIdCommand:
+				// 通过用户 id 查询离线消息
+				logic.OfflineMessage(c.CommandMap, conn, constants.OfflineMsgByIdCommand)
 			}
 		}
 	}()
@@ -146,10 +152,10 @@ func main() {
 					if ackPack.Sign {
 						var offlineMsgMap map[string]string
 						err = json.Unmarshal(ackPack.Data, &offlineMsgMap)
-						fmt.Println(offlineMsgMap)
+						//fmt.Println(offlineMsgMap)
 						if len(offlineMsgMap) > 0 {
 							for key, value := range offlineMsgMap {
-								fmt.Printf("\b\b[offline]you have %s unread messages from %s\n", value, key)
+								fmt.Printf("\b\b[offline] you have %s unread messages from %s\n", value, key)
 							}
 						}
 					} else {
@@ -239,6 +245,25 @@ func main() {
 				case constants.SendMessageAckOpt:
 					// 发送消息
 					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.OfflineMsgAckOpt:
+					// 离线消息
+					if ackPack.Sign {
+						var offlineMsgMap map[string][]byte
+						err = json.Unmarshal(ackPack.Data, &offlineMsgMap)
+
+						for _, value := range offlineMsgMap {
+							// 离线消息
+							var message model.Message
+							err = json.Unmarshal(value, &message)
+							if err != nil {
+								fmt.Printf("unmarshal messages err: %v\n", err)
+							}
+
+							fmt.Printf("\b\b\"%s\" -- %v\n", message.Content, message.CreateTime)
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				}
 
 				fmt.Print("~ ")

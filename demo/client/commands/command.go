@@ -38,6 +38,8 @@ func NewCommand(name string) *Command {
 // 好友列表：tim -f -list
 // 与好友聊天：tim -chat -u 用户名 -m 消息内容
 // 			 tim -chat -n 用户 id -m 消息内容
+// 查看离线消息：tim -o -u 用户名
+//			   tim -o -n 用户 id
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -67,6 +69,8 @@ func (c *Command) CommandInit() {
 	c.FlagSet.Bool("chat", false, "chat with friend or group")
 	// 消息内容
 	c.FlagSet.String("m", "", "message")
+	// 查看离线消息
+	c.FlagSet.Bool("o", false, "offline message")
 }
 
 // 解析命令
