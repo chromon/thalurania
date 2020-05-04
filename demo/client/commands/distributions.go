@@ -53,6 +53,9 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if OfflineMsgByIdCommand(m) {
 		// 通过用户 id 查询离线消息
 		return constants.OfflineMsgByIdCommand
+	} else if CreateGroupCommand(m) {
+		// 创建群组
+		return constants.CreateGroupCommand
 	}
 
 	// 无效命令
@@ -218,6 +221,17 @@ func OfflineMsgByIdCommand(m map[string]*flag.Flag) bool {
 	_, n := m["n"]
 
 	if o && n {
+		return true
+	}
+	return false
+}
+
+// 创建群组
+func CreateGroupCommand(m map[string]*flag.Flag) bool {
+	_, add := m["add"]
+	_, g := m["g"]
+
+	if add && g {
 		return true
 	}
 	return false

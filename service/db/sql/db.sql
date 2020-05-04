@@ -73,8 +73,8 @@ CREATE TABLE `message`
   COMMENT = '消息';
 
 /* 群组表 */
-DROP TABLE IF EXISTS `group`;
-CREATE TABLE `group`
+DROP TABLE IF EXISTS `im_group`;
+CREATE TABLE `im_group`
 (
   `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `group_id`     bigint(20)          NOT NULL COMMENT '群组id',

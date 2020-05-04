@@ -101,6 +101,9 @@ func main() {
 			case constants.OfflineMsgByIdCommand:
 				// 通过用户 id 查询离线消息
 				logic.OfflineMessage(c.CommandMap, conn, constants.OfflineMsgByIdCommand)
+			case constants.CreateGroupCommand:
+				// 创建群组
+				logic.CreateGroup(conn)
 			}
 		}
 	}()
@@ -264,6 +267,8 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.CeateGroupAckOpt:
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Printf("\b\b~ ")

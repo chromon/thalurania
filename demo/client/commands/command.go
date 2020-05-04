@@ -29,7 +29,7 @@ func NewCommand(name string) *Command {
 // 登出：tim -q
 // 搜索：tim -s -u 用户名
 // 		tim -s -n 用户 id
-// 		tim -s -g 用户组 id
+// 		tim -s -g -n 用户组 id
 // 好友请求：tim -add -u 用户名
 //		   tim -add -n 用户 id
 // 好友请求列表：tim -fr -list
@@ -40,6 +40,7 @@ func NewCommand(name string) *Command {
 // 			 tim -chat -n 用户 id -m 消息内容
 // 查看离线消息：tim -o -u 用户名
 //			   tim -o -n 用户 id
+// 创建群组：tim -add -g
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")
@@ -53,8 +54,8 @@ func (c *Command) CommandInit() {
 	c.FlagSet.Bool("q", false, "logout an account")
 	// 搜索
 	c.FlagSet.Bool("s", false, "search")
-	// 用户 id
-	c.FlagSet.String("n", "", "account id")
+	// 用户或组 id
+	c.FlagSet.String("n", "", "account or group id")
 	// 请求添加好友
 	c.FlagSet.Bool("add", false, "request to be friends or group")
 	// 请求好友
@@ -71,6 +72,8 @@ func (c *Command) CommandInit() {
 	c.FlagSet.String("m", "", "message")
 	// 查看离线消息
 	c.FlagSet.Bool("o", false, "offline message")
+	// 群组
+	c.FlagSet.Bool("g", false, "group")
 }
 
 // 解析命令

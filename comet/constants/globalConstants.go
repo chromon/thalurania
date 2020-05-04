@@ -34,6 +34,9 @@ const (
 
 	// 离线消息
 	OfflineMessageOption = 110
+
+	// 创建群组
+	CreateGroupOption = 111
 )
 
 // 数据持久化协议指令
@@ -82,6 +85,9 @@ const (
 
 	// 离线消息
 	OfflineMsgAckOpt = 311
+
+	// 创建群组
+	CeateGroupAckOpt = 312
 )
 
 // 网络协议
@@ -154,4 +160,7 @@ const (
 
 	// 通过用户 id 查询离线消息
 	OfflineMsgByIdCommand = 616
+
+	// 创建群组
+	CreateGroupCommand = 617
 )
