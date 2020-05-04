@@ -71,6 +71,9 @@ func main() {
 			case constants.SearchUserIdCommand:
 				// 通过用户 id 进行搜索
 				logic.Search(c.CommandMap, conn, constants.SearchUserIdCommand)
+			case constants.SearchGroupCommand:
+				// 搜索群组
+				logic.Search(c.CommandMap, conn, constants.SearchGroupCommand)
 			case constants.AddUserByNameCommand:
 				// 通过用户名添加好友
 				logic.FriendRequest(c.CommandMap, conn, constants.AddUserByNameCommand)
@@ -179,16 +182,7 @@ func main() {
 					}
 				case constants.SearchAckOpt:
 					// 搜索
-					if ackPack.Sign {
-						var user model.User
-						err = json.Unmarshal(ackPack.Data, &user)
-						if err != nil {
-							fmt.Printf("unmarshal user err: %v\n", err)
-						}
-						fmt.Printf("\b\b[id: %d, username: \"%s\", nickname: \"%s\"]\n", user.UserId, user.Username, user.Nickname)
-					} else {
-						fmt.Printf("\b\b%s \n", ackPack.Data)
-					}
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.FriendRequestAckOpt:
 					// 添加好友请求
 					fmt.Printf("\b\b%s \n", ackPack.Data)

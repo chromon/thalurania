@@ -43,3 +43,17 @@ func (u *GroupDAO) QueryGroupById(g model.Group) (bool, *model.Group) {
 
 	return true, &g
 }
+
+// 通过群组 id 查询
+func (u *GroupDAO) QueryGroupByGroupId(g model.Group) (bool, *model.Group) {
+	// 查询
+	row := u.GoDB.QueryRow("select * from im_group where group_id=?", g.GroupId)
+
+	err := row.Scan(&g.Id, &g.GroupId, &g.Name, &g.Introduction, &g.UserCount, &g.Type, &g.Extra, &g.CreateTime, &g.UpdateTime)
+	if err != nil {
+		log.Error.Println("query group by group id err:", err)
+		return false, nil
+	}
+
+	return true, &g
+}

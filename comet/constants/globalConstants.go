@@ -163,4 +163,7 @@ const (
 
 	// 创建群组
 	CreateGroupCommand = 617
+
+	// 搜索用户组
+	SearchGroupCommand = 618
 )

@@ -30,14 +30,17 @@ func (sr *SearchRouter) Handle(r api.IRequest) {
 
 	// 用户信息
 	var user model.User
-	err = json.Unmarshal(stp.Data, &user)
-	if err != nil {
-		log.Error.Printf("unmarshal user err: %v\n", err)
-	}
+	// 群组信息
+	var group model.Group
 
 	switch stp.Opt {
 	case constants.SearchUsernameCommand:
 		// 搜索用户名
+		err = json.Unmarshal(stp.Data, &user)
+		if err != nil {
+			log.Error.Printf("unmarshal user err: %v\n", err)
+		}
+
 		// 搜索失败信息
 		sr.info = "username - '" + user.Username + "'"
 
@@ -46,12 +49,17 @@ func (sr *SearchRouter) Handle(r api.IRequest) {
 		exist, u := userDAO.QueryUserByName(user)
 		if exist {
 			sr.success = true
-			sr.user = *u
+			sr.info = "[id: " + strconv.FormatInt(u.UserId,10) + ", username: \"" + u.Username +"\", nickname: \"" + u.Nickname + "\"]"
 		} else {
 			sr.success = false
 		}
 	case constants.SearchUserIdCommand:
 		// 搜索用户 id
+		err = json.Unmarshal(stp.Data, &user)
+		if err != nil {
+			log.Error.Printf("unmarshal user err: %v\n", err)
+		}
+
 		// 搜索失败信息
 		sr.info = "userId - '" + strconv.FormatInt(user.UserId,10) + "'"
 
@@ -60,7 +68,25 @@ func (sr *SearchRouter) Handle(r api.IRequest) {
 		exist, u := userDAO.QueryUserById(user)
 		if exist {
 			sr.success = true
-			sr.user = *u
+			sr.info = "[id: " + strconv.FormatInt(u.UserId,10) + ", username: \"" + u.Username +"\", nickname: \"" + u.Nickname + "\"]"
+		} else {
+			sr.success = false
+		}
+	case constants.SearchGroupCommand:
+		// 搜索群组
+		err = json.Unmarshal(stp.Data, &group)
+		if err != nil {
+			log.Error.Printf("unmarshal group err: %v\n", err)
+		}
+
+		// 搜索失败信息
+		sr.info = "groupId - '" + strconv.FormatInt(group.GroupId,10) + "'"
+
+		groupDAO := dao.NewGroupDAO(variable.GoDB)
+		exist, g := groupDAO.QueryGroupByGroupId(group)
+		if exist {
+			sr.success = true
+			sr.info = "[groupId: " + strconv.FormatInt(g.GroupId,10) + ", groupName: " + g.Name + ", introduction: \"" + g.Introduction + "\"]"
 		} else {
 			sr.success = false
 		}
@@ -72,12 +98,7 @@ func (sr *SearchRouter) PostHandle(r api.IRequest) {
 	// 反向客户端发送 ack 数据
 	var searchMsg []byte
 	if sr.success {
-		// 序列化用户对象
-		ret, err := json.Marshal(sr.user)
-		if err != nil {
-			log.Info.Println("serialize user object err:", err)
-		}
-		searchMsg = ret
+		searchMsg = []byte(sr.info)
 	} else {
 		searchMsg = []byte("oops, the search info " + sr.info +" not exist")
 	}

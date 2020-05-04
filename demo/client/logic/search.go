@@ -18,6 +18,7 @@ func Search(m map[string]*flag.Flag, conn net.Conn, opt int32) {
 	IdWorker, _ := sequence.NewWorker(0)
 
 	var u model.User
+	var g model.Group
 
 	// 创建用户对象
 	switch opt {
@@ -31,12 +32,30 @@ func Search(m map[string]*flag.Flag, conn net.Conn, opt int32) {
 			fmt.Println("parse user id err:", err)
 		}
 		u = model.User{UserId: userId}
+	case constants.SearchGroupCommand:
+		// 搜索群组
+		groupId, err := strconv.ParseInt(strings.TrimSpace(m["n"].Value.String()), 10, 64)
+		if err != nil {
+			fmt.Println("parse group id err:", err)
+		}
+		g = model.Group{GroupId: groupId}
 	}
 
 	// 序列化用户对象
-	ret, err := json.Marshal(u)
-	if err != nil {
-		log.Info.Println("serialize user object err:", err)
+	var ret []byte
+	var err error
+	if opt == constants.SearchGroupCommand {
+		// 序列化群组
+		ret, err = json.Marshal(g)
+		if err != nil {
+			log.Info.Println("serialize group object err:", err)
+		}
+	} else {
+		// 序列化用户
+		ret, err = json.Marshal(u)
+		if err != nil {
+			log.Info.Println("serialize user object err:", err)
+		}
 	}
 
 	serverTransPack := packet.NewServerTransPack(opt, []byte(ret))

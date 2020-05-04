@@ -20,6 +20,9 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if SearchUsernameCommand(m) {
 		// 搜索用户名
 		return constants.SearchUsernameCommand
+	} else if SearchGroupIdCommand(m) {
+		// 搜索用户组
+		return constants.SearchGroupCommand
 	} else if SearchUserIdCommand(m) {
 		// 搜索用户 id
 		return constants.SearchUserIdCommand
@@ -103,12 +106,24 @@ func SearchUsernameCommand(m map[string]*flag.Flag) bool {
 	return false
 }
 
-// 搜索用户名命令
+// 搜索用户 id 命令
 func SearchUserIdCommand(m map[string]*flag.Flag) bool {
 	_, s := m["s"]
 	_, n := m["n"]
 
 	if s && n {
+		return true
+	}
+	return false
+}
+
+// 搜索用户名命令
+func SearchGroupIdCommand(m map[string]*flag.Flag) bool {
+	_, s := m["s"]
+	_, g := m["g"]
+	_, n := m["n"]
+
+	if s && g && n {
 		return true
 	}
 	return false
