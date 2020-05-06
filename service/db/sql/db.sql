@@ -90,6 +90,21 @@ CREATE TABLE `im_group`
   DEFAULT CHARSET = utf8mb4
   COMMENT = '群组';
 
+/* 群组邀请表 */
+DROP TABLE IF EXISTS `group_invite`;
+CREATE TABLE IF NOT EXISTS group_invite (
+    `id`         bigint(20) NOT NULL AUTO_INCREMENT COMMENT '群组邀请 Id（唯一标识）',
+    `user_id`    bigint(20) NOT NULL COMMENT '用户 Id',
+    `friend_id`  bigint(20) NOT NULL COMMENT '好友 Id',
+    `group_id`   bigint(20) NOT NULL COMMENT '群组 Id',
+    `del`        tinyint(4) NOT NULL COMMENT '是否已删除 0：否，1：是',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`) USING BTREE,
+    KEY `idx_friend_id` (`friend_id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COMMENT = '群组邀请';
+
 /* 群组成员表 */
 DROP TABLE IF EXISTS `group_user`;
 CREATE TABLE `group_user`

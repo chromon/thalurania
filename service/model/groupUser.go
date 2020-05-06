@@ -5,7 +5,7 @@ import "time"
 // 群成员
 type GroupUser struct {
 	// 群组成员组件 Id
-	id int64 `json:"id"`
+	Id int64 `json:"id"`
 
 	// 群组 Id
 	GroupId int64 `json:"group_id"`

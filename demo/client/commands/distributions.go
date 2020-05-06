@@ -59,6 +59,12 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if CreateGroupCommand(m) {
 		// 创建群组
 		return constants.CreateGroupCommand
+	} else if GroupInviteByNameCommand(m) {
+		// 通过用户名邀请到群组
+		return constants.GroupInviteByNameCommand
+	} else if GroupInviteByIdCommand(m) {
+		// 通过用户 id 邀请到群组
+		return constants.GroupInviteByIdCommand
 	}
 
 	// 无效命令
@@ -121,9 +127,9 @@ func SearchUserIdCommand(m map[string]*flag.Flag) bool {
 func SearchGroupIdCommand(m map[string]*flag.Flag) bool {
 	_, s := m["s"]
 	_, g := m["g"]
-	_, n := m["n"]
+	_, gn := m["gn"]
 
-	if s && g && n {
+	if s && g && gn {
 		return true
 	}
 	return false
@@ -247,6 +253,30 @@ func CreateGroupCommand(m map[string]*flag.Flag) bool {
 	_, g := m["g"]
 
 	if add && g {
+		return true
+	}
+	return false
+}
+
+// 群组通过用户名邀请
+func GroupInviteByNameCommand(m map[string]*flag.Flag) bool {
+	_, i := m["i"]
+	_, u := m["u"]
+	_, gn := m["gn"]
+
+	if i && u && gn {
+		return true
+	}
+	return false
+}
+
+// 群组通过用户 id 邀请
+func GroupInviteByIdCommand(m map[string]*flag.Flag) bool {
+	_, i := m["i"]
+	_, n := m["n"]
+	_, gn := m["gn"]
+
+	if i && n && gn {
 		return true
 	}
 	return false

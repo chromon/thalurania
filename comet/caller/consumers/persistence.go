@@ -42,6 +42,12 @@ func Consume(msg redis.Message) error {
 		if err != nil {
 			return err
 		}
+	case constants.GroupRequestPersistOpt:
+		// 插入群组请求
+		err = insertGroupInvite(dw.Model)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -102,6 +108,25 @@ func insertMessage(m []byte) error {
 	_, err = messageDAO.AddMessage(msg)
 	if err != nil {
 		return errors.New("insert message error")
+	}
+
+	return nil
+}
+
+// 插入群组邀请
+func insertGroupInvite(m []byte) error {
+	// json 解析 group invite 数据
+	var gi model.GroupInvite
+	err := json.Unmarshal(m, &gi)
+	if err != nil {
+		log.Error.Printf("unmarshal group invite err: %v\n", err)
+	}
+
+	// 添加群组邀请
+	groupInviteDAO := dao.NewGroupInviteDAO(variable.GoDB)
+	_, err = groupInviteDAO.AddGroupInvite(gi)
+	if err != nil {
+		return errors.New("insert group invite error")
 	}
 
 	return nil

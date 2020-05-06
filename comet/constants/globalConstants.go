@@ -37,6 +37,9 @@ const (
 
 	// 创建群组
 	CreateGroupOption = 111
+
+	// 群组邀请
+	GroupInviteOption = 112
 )
 
 // 数据持久化协议指令
@@ -49,6 +52,9 @@ const (
 
 	// 添加消息
 	MessagePersistenceOpt = 203
+
+	// 群组邀请
+	GroupRequestPersistOpt = 204
 )
 
 // 回执信息指令
@@ -87,7 +93,10 @@ const (
 	OfflineMsgAckOpt = 311
 
 	// 创建群组
-	CeateGroupAckOpt = 312
+	CreateGroupAckOpt = 312
+
+	// 群组邀请
+	GroupRequestAckOpt = 313
 )
 
 // 网络协议
@@ -109,6 +118,9 @@ const (
 
 	// 登录成功
 	LoginSuccess = 504
+
+	// 发送群组请求
+	SendGroupRequest = 505
 )
 
 // 客户端命令
@@ -166,4 +178,10 @@ const (
 
 	// 搜索用户组
 	SearchGroupCommand = 618
+
+	// 通过用户名邀请到群组
+	GroupInviteByNameCommand = 619
+
+	// 通过用户 id 邀请到群组
+	GroupInviteByIdCommand = 620
 )

@@ -107,6 +107,12 @@ func main() {
 			case constants.CreateGroupCommand:
 				// 创建群组
 				logic.CreateGroup(conn)
+			case constants.GroupInviteByNameCommand:
+				// 通过用户名邀请到群组
+				logic.GroupInvite(c.CommandMap, conn, constants.GroupInviteByNameCommand)
+			case constants.GroupInviteByIdCommand:
+				// 通过用户 id 邀请到群组
+				logic.GroupInvite(c.CommandMap, conn, constants.GroupInviteByIdCommand)
 			}
 		}
 	}()
@@ -261,7 +267,11 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
-				case constants.CeateGroupAckOpt:
+				case constants.CreateGroupAckOpt:
+					// 创建群组
+					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.GroupRequestAckOpt:
+					// 群组邀请
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 

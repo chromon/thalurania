@@ -64,7 +64,7 @@ func (cr *CreateGroupRouter) Handle(r api.IRequest) {
 // 回执消息
 func (cr *CreateGroupRouter) PostHandle(r api.IRequest) {
 	// 包装 ack
-	ackPack := packet.NewServerAckPack(constants.CeateGroupAckOpt, true, cr.msg)
+	ackPack := packet.NewServerAckPack(constants.CreateGroupAckOpt, true, cr.msg)
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
 		log.Info.Println("serialize create group ack pack object err:", err)

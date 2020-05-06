@@ -34,7 +34,7 @@ func Search(m map[string]*flag.Flag, conn net.Conn, opt int32) {
 		u = model.User{UserId: userId}
 	case constants.SearchGroupCommand:
 		// 搜索群组
-		groupId, err := strconv.ParseInt(strings.TrimSpace(m["n"].Value.String()), 10, 64)
+		groupId, err := strconv.ParseInt(strings.TrimSpace(m["gn"].Value.String()), 10, 64)
 		if err != nil {
 			fmt.Println("parse group id err:", err)
 		}
