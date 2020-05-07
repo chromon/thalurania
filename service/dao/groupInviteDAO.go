@@ -42,9 +42,31 @@ func (u *GroupInviteDAO) QueryGroupInviteCount(user model.User) int64 {
 	return count
 }
 
+// 查询收到的给定群组邀请数量
+func (u *GroupInviteDAO) QueryGroupInviteByGroupId(user model.User, group model.Group) int64 {
+	// 查询
+	var count int64
+	err := u.GoDB.QueryRow("select count(*) from group_invite where friend_id=? and group_id=? and del=0", user.UserId, group.GroupId).Scan(&count)
+	if err != nil {
+		log.Error.Println("query group invite count err:", err)
+		return 0
+	}
+	return count
+}
+
 // 查询接收到的群组邀请
 func (u *GroupInviteDAO) QueryGroupInvite(user model.User) (*sql.Rows, error) {
 	// 查询
 	row, err := u.GoDB.Query("select * from group_invite where friend_id=? and del=0", user.UserId)
 	return row, err
+}
+
+// 更新群组邀请
+func (u *GroupInviteDAO) Update(gi model.GroupInvite) int64 {
+	affNum, err := u.GoDB.Update("update group_invite set del = 1 where friend_id = ? and group_id = ?", gi.FriendId, gi.GroupId)
+	if err != nil {
+		log.Info.Println("update group invite err:", err)
+		return 0
+	}
+	return affNum
 }

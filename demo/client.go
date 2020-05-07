@@ -116,6 +116,9 @@ func main() {
 			case constants.GroupInviteListCommand:
 				// 群组邀请列表
 				logic.GroupInviteList(conn)
+			case constants.AcceptGroupInviteCommand:
+				// 接受群组邀请
+				logic.AcceptGroup(c.CommandMap, conn)
 			}
 		}
 	}()
@@ -285,6 +288,8 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.AcceptGroupInviteAckOpt:
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Printf("\b\b~ ")

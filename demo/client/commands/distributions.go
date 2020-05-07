@@ -68,6 +68,9 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if GroupInviteListCommand(m) {
 		// 群组邀请列表
 		return constants.GroupInviteListCommand
+	} else if AcceptGroupInviteCommand(m) {
+		// 接受群组邀请
+		return constants.AcceptGroupInviteCommand
 	}
 
 	// 无效命令
@@ -292,6 +295,17 @@ func GroupInviteListCommand(m map[string]*flag.Flag) bool {
 	_, list := m["list"]
 
 	if g && i && list {
+		return true
+	}
+	return false
+}
+
+// 通过群组 id 接受群组邀请
+func AcceptGroupInviteCommand(m map[string]*flag.Flag) bool {
+	_, accept := m["accept"]
+	_, gn := m["gn"]
+
+	if accept && gn {
 		return true
 	}
 	return false

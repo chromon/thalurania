@@ -34,8 +34,9 @@ func (gr *GroupInviteListRouter) Handle(r api.IRequest) {
 	groupInviteDAO := dao.NewGroupInviteDAO(variable.GoDB)
 	// 查询群组邀请数量
 	count := groupInviteDAO.QueryGroupInviteCount(*u)
+	log.Info.Println(count)
 	if count < 1 {
-		gr.msg = "no group invitations"
+		gr.msg = "no more group invitations found"
 		return
 	}
 
