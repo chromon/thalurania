@@ -43,6 +43,7 @@ func NewCommand(name string) *Command {
 // 创建群组：tim -add -g
 // 群组邀请：tim -i -u 用户名 -gn 群组 id
 // 		   tim -i -n 用户 id -gn 群组 id
+// 群组邀请列表：tim -g -i -list
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")

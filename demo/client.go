@@ -113,6 +113,9 @@ func main() {
 			case constants.GroupInviteByIdCommand:
 				// 通过用户 id 邀请到群组
 				logic.GroupInvite(c.CommandMap, conn, constants.GroupInviteByIdCommand)
+			case constants.GroupInviteListCommand:
+				// 群组邀请列表
+				logic.GroupInviteList(conn)
 			}
 		}
 	}()
@@ -273,6 +276,15 @@ func main() {
 				case constants.GroupRequestAckOpt:
 					// 群组邀请
 					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.GroupInviteAckOpt:
+					if ackPack.Sign {
+						res := strings.Split(string(ackPack.Data), ",")
+						for i := 0; i < len(res) - 1; i++ {
+							fmt.Printf("\b\b%s \n", res[i])
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				}
 
 				fmt.Printf("\b\b~ ")

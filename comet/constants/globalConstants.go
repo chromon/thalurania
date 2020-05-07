@@ -40,6 +40,9 @@ const (
 
 	// 群组邀请
 	GroupInviteOption = 112
+
+	// 群组邀请列表
+	GroupInviteListOption = 113
 )
 
 // 数据持久化协议指令
@@ -97,6 +100,9 @@ const (
 
 	// 群组邀请
 	GroupRequestAckOpt = 313
+
+	// 群组邀请列表
+	GroupInviteAckOpt = 314
 )
 
 // 网络协议
@@ -184,4 +190,7 @@ const (
 
 	// 通过用户 id 邀请到群组
 	GroupInviteByIdCommand = 620
+
+	// 群组邀请列表
+	GroupInviteListCommand = 621
 )

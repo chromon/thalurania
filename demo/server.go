@@ -66,6 +66,7 @@ func main() {
 	s.AddRouter(constants.OfflineMessageOption, &routers.OfflineMsgRouter{})
 	s.AddRouter(constants.CreateGroupOption, &routers.CreateGroupRouter{})
 	s.AddRouter(constants.GroupInviteOption, &routers.GroupInviteRouter{})
+	s.AddRouter(constants.GroupInviteListOption, &routers.GroupInviteListRouter{})
 
 	// 开启服务
 	s.Serve()
