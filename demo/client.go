@@ -122,6 +122,9 @@ func main() {
 			case constants.GroupMemberCommand:
 				// 群成员列表
 				logic.GroupMembers(c.CommandMap, conn)
+			case constants.GroupListCommand:
+				// 已加入的群组列表
+				logic.GroupList(conn)
 			}
 		}
 	}()
@@ -283,6 +286,7 @@ func main() {
 					// 群组邀请
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.GroupInviteAckOpt:
+					// 群组邀请列表
 					if ackPack.Sign {
 						res := strings.Split(string(ackPack.Data), ",")
 						for i := 0; i < len(res) - 1; i++ {
@@ -292,8 +296,20 @@ func main() {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
 				case constants.AcceptGroupInviteAckOpt:
+					// 接受群组邀请
 					fmt.Printf("\b\b%s \n", ackPack.Data)
 				case constants.GroupMembersAckOpt:
+					// 群组成员列表
+					if ackPack.Sign {
+						res := strings.Split(string(ackPack.Data), ",")
+						for i := 0; i < len(res) - 1; i++ {
+							fmt.Printf("\b\b%s \n", res[i])
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
+				case constants.GroupListAckOpt:
+					// 已加入群组列表
 					if ackPack.Sign {
 						res := strings.Split(string(ackPack.Data), ",")
 						for i := 0; i < len(res) - 1; i++ {

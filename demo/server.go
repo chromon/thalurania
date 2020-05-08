@@ -69,6 +69,7 @@ func main() {
 	s.AddRouter(constants.GroupInviteListOption, &routers.GroupInviteListRouter{})
 	s.AddRouter(constants.AcceptGroupInviteOption, &routers.AcceptGroupRouter{})
 	s.AddRouter(constants.GroupMembersOption, &routers.GroupMembersRouter{})
+	s.AddRouter(constants.GroupListOption, &routers.GroupListRouter{})
 
 	// 开启服务
 	s.Serve()

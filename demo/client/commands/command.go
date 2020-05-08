@@ -45,6 +45,7 @@ func NewCommand(name string) *Command {
 // 		   tim -i -n [用户 id] -gn [群组 id]
 // 群组邀请列表：tim -g -i -list
 // 接受群组邀请：tim -accept -gn [群组 id]
+// 加入的群组列表：tim -g -list
 // 群成员列表：tim -g -gn [群组 id] -list
 func (c *Command) CommandInit() {
 	// 注册

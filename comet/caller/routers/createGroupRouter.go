@@ -28,7 +28,8 @@ func (cr *CreateGroupRouter) Handle(r api.IRequest) {
 	u := user.(*model.User)
 
 	// 新建空白群组
-	group := model.Group{GroupId: variable.IdWorker.GetId()}
+	groupId := variable.IdWorker.GetId()
+	group := model.Group{GroupId: groupId, Name: "group_" + strconv.FormatInt(groupId, 10)}
 	// 插入群组
 	groupDAO := dao.NewGroupDAO(variable.GoDB)
 	insertId, err := groupDAO.AddGroup(group)

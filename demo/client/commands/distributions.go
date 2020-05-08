@@ -74,6 +74,9 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if GroupMemberCommand(m) {
 		// 群成员列表
 		return constants.GroupMemberCommand
+	} else if GroupListCommand(m) {
+		// 已加入的群组列表
+		return constants.GroupListCommand
 	}
 
 	// 无效命令
@@ -321,6 +324,17 @@ func GroupMemberCommand(m map[string]*flag.Flag) bool {
 	_, list := m["list"]
 
 	if g && gn && list {
+		return true
+	}
+	return false
+}
+
+// 已加入的群组列表
+func GroupListCommand(m map[string]*flag.Flag) bool {
+	_, g := m["g"]
+	_, list := m["list"]
+
+	if g && list {
 		return true
 	}
 	return false

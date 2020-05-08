@@ -49,6 +49,9 @@ const (
 
 	// 群组成员列表
 	GroupMembersOption = 115
+
+	// 已加入的群组列表
+	GroupListOption = 116
 )
 
 // 数据持久化协议指令
@@ -115,6 +118,9 @@ const (
 
 	// 群组成员列表
 	GroupMembersAckOpt = 316
+
+	// 已加入群组列表
+	GroupListAckOpt = 317
 )
 
 // 网络协议
@@ -211,4 +217,7 @@ const (
 
 	// 群成员列表
 	GroupMemberCommand = 623
+
+	// 已加入的群组列表
+	GroupListCommand = 624
 )

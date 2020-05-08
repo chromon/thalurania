@@ -63,3 +63,22 @@ func (gu *GroupUserDAO) QueryGroupUsers(group model.Group) (*sql.Rows, error) {
 	row, err := gu.GoDB.Query("select * from group_user where group_id=?", group.GroupId)
 	return row, err
 }
+
+// 查询用户所在的群组数量
+func (gu *GroupUserDAO) QueryGroupCountByUser(user model.User) int64 {
+	// 查询
+	var count int64
+	err := gu.GoDB.QueryRow("select count(*) from group_user where user_id=?", user.UserId).Scan(&count)
+	if err != nil {
+		log.Error.Println("query group count by user err:", err)
+		return 0
+	}
+	return count
+}
+
+// 查询用户所在的群组
+func (gu *GroupUserDAO) QueryGroupByUser(user model.User) (*sql.Rows, error) {
+	// 查询
+	row, err := gu.GoDB.Query("select * from group_user where user_id=?", user.UserId)
+	return row, err
+}
