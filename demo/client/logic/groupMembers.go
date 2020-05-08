@@ -14,8 +14,8 @@ import (
 	"strings"
 )
 
-// 接受群组请求
-func AcceptGroup(m map[string]*flag.Flag, conn net.Conn) {
+// 群组成员列表
+func GroupMembers(m map[string]*flag.Flag, conn net.Conn) {
 	IdWorker, _ := sequence.NewWorker(0)
 
 	var g model.Group
@@ -34,9 +34,9 @@ func AcceptGroup(m map[string]*flag.Flag, conn net.Conn) {
 
 	// 封包群组对象消息并发送
 	dp := packet.NewDataPack()
-	msg, _ := dp.Pack(constants.TCPNetwork, constants.AcceptGroupInviteOption, packet.NewMessage(IdWorker.GetId(), ret))
+	msg, _ := dp.Pack(constants.TCPNetwork, constants.GroupMembersOption, packet.NewMessage(IdWorker.GetId(), ret))
 	_, err = conn.Write(msg)
 	if err != nil {
-		log.Error.Println("client accept group write message err:", err)
+		log.Error.Println("client group list write message err:", err)
 	}
 }

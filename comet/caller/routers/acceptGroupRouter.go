@@ -39,7 +39,7 @@ func (ar *AcceptGroupRouter) Handle(r api.IRequest) {
 	groupDAO := dao.NewGroupDAO(variable.GoDB)
 	gExist, g := groupDAO.QueryGroupByGroupId(group)
 	if !gExist {
-		ar.msg = []byte("group id not exist, check it again")
+		ar.msg = []byte("group id not found, check it again")
 		return
 	}
 
@@ -48,7 +48,7 @@ func (ar *AcceptGroupRouter) Handle(r api.IRequest) {
 	count := groupInviteDAO.QueryGroupInviteByGroupId(*u, *g)
 	if count < 1 {
 		// 邀请不存在
-		ar.msg = []byte("invitation doesn't exist, check it again")
+		ar.msg = []byte("invitation not found, check it again")
 		return
 	}
 

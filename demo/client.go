@@ -119,6 +119,9 @@ func main() {
 			case constants.AcceptGroupInviteCommand:
 				// 接受群组邀请
 				logic.AcceptGroup(c.CommandMap, conn)
+			case constants.GroupMemberCommand:
+				// 群成员列表
+				logic.GroupMembers(c.CommandMap, conn)
 			}
 		}
 	}()
@@ -290,6 +293,15 @@ func main() {
 					}
 				case constants.AcceptGroupInviteAckOpt:
 					fmt.Printf("\b\b%s \n", ackPack.Data)
+				case constants.GroupMembersAckOpt:
+					if ackPack.Sign {
+						res := strings.Split(string(ackPack.Data), ",")
+						for i := 0; i < len(res) - 1; i++ {
+							fmt.Printf("\b\b%s \n", res[i])
+						}
+					} else {
+						fmt.Printf("\b\b%s \n", ackPack.Data)
+					}
 				}
 
 				fmt.Printf("\b\b~ ")

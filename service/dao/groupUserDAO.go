@@ -2,7 +2,9 @@ package dao
 
 import (
 	"chalurania/service/db/conn"
+	"chalurania/service/log"
 	"chalurania/service/model"
+	"database/sql"
 	"time"
 )
 
@@ -41,4 +43,23 @@ func (gu *GroupUserDAO) QueryGroupUserById(user model.User, group model.Group) (
 	}
 
 	return true, &g
+}
+
+// 查询收到的群组邀请数量
+func (gu *GroupUserDAO) QueryGroupUserCount(group model.Group) int64 {
+	// 查询
+	var count int64
+	err := gu.GoDB.QueryRow("select count(*) from group_user where group_id=?", group.GroupId).Scan(&count)
+	if err != nil {
+		log.Error.Println("query group user count err:", err)
+		return 0
+	}
+	return count
+}
+
+// 查询群组成员列表
+func (gu *GroupUserDAO) QueryGroupUsers(group model.Group) (*sql.Rows, error) {
+	// 查询
+	row, err := gu.GoDB.Query("select * from group_user where group_id=?", group.GroupId)
+	return row, err
 }
