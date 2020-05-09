@@ -83,12 +83,43 @@ func (lr *LoginRouter) Handle(r api.IRequest) {
 		// 订阅自己的频道
 		ctx, _ := context.WithCancel(context.Background())
 		go func() {
-			// 订阅频道
-			err := variable.RedisPool.Subscribe(ctx, uc.Consume(), chanName)
+		// 订阅频道
+			err = variable.RedisPool.Subscribe(ctx, uc.Consume(), chanName)
 			if err != nil {
 				log.Error.Println("subscribe UserConsume channel err:", err)
 			}
 		}()
+
+		// 遍历已加入的群组，并订阅群组频道
+		// 查询群组
+		groupUserDAO := dao.NewGroupUserDAO(variable.GoDB)
+		row, err := groupUserDAO.QueryGroupByUser(*user)
+		defer func() {
+			if err = row.Close(); err != nil {
+				panic(err)
+			}
+		}()
+		// 遍历群组
+		for row.Next() {
+			var gu model.GroupUser
+			err = row.Scan(&gu.Id, &gu.GroupId, &gu.UserId, &gu.Label, &gu.Extra, &gu.CreateTime, &gu.UpdateTime)
+			if err != nil {
+				log.Error.Println("scan group user id err:", err)
+				return
+			}
+
+			groupChanName := "GroupChannel:" + strconv.FormatInt(gu.GroupId,10)
+
+			// 订阅群组
+			go func() {
+				err := variable.RedisPool.Subscribe(ctx, uc.Consume(), groupChanName)
+				if err != nil {
+					log.Error.Println("subscribe GroupConsume channel err:", err)
+				}
+				log.Info.Println("subscribe group:", gu.GroupId)
+			}()
+		}
+
 
 		// 将频道存储在 redis hash 中
 		// 用户频道名定义：key - "user:用户id"，field - channel， value - "UserChannel：用户id"
