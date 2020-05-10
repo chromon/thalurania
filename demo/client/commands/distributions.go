@@ -77,6 +77,9 @@ func CommandDistribute(m map[string]*flag.Flag) int32 {
 	} else if GroupListCommand(m) {
 		// 已加入的群组列表
 		return constants.GroupListCommand
+	} else if GroupChatCommand(m) {
+		// 群组聊天
+		return constants.GroupChatCommand
 	}
 
 	// 无效命令
@@ -335,6 +338,18 @@ func GroupListCommand(m map[string]*flag.Flag) bool {
 	_, list := m["list"]
 
 	if g && list {
+		return true
+	}
+	return false
+}
+
+// 群组聊天
+func GroupChatCommand(m map[string]*flag.Flag) bool {
+	_, chat := m["chat"]
+	_, gn := m["gn"]
+	_, msg := m["m"]
+
+	if chat && gn && msg {
 		return true
 	}
 	return false

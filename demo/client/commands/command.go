@@ -47,6 +47,7 @@ func NewCommand(name string) *Command {
 // 接受群组邀请：tim -accept -gn [群组 id]
 // 加入的群组列表：tim -g -list
 // 群成员列表：tim -g -gn [群组 id] -list
+// 群聊天：tim -chat -gn [群组 id] -m [消息内容]
 func (c *Command) CommandInit() {
 	// 注册
 	c.FlagSet.Bool("r", false, "register an account")

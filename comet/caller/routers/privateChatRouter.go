@@ -178,13 +178,13 @@ func (pc *PrivateChatRouter) PostHandle(r api.IRequest) {
 	ackPack := packet.NewServerAckPack(constants.SendMessageAckOpt, true, pc.msg)
 	ret, err := json.Marshal(ackPack)
 	if err != nil {
-		log.Info.Println("serialize login ack pack object err:", err)
+		log.Info.Println("serialize private chat ack pack object err:", err)
 		return
 	}
 
 	// 发送回执
 	err = r.GetConnection().SendMsg(constants.TCPNetwork, constants.AckOption, 101, ret)
 	if err != nil {
-		log.Error.Println("login send ack message to client err:", err)
+		log.Error.Println("private chat send ack message to client err:", err)
 	}
 }

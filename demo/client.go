@@ -125,6 +125,9 @@ func main() {
 			case constants.GroupListCommand:
 				// 已加入的群组列表
 				logic.GroupList(conn)
+			case constants.GroupChatCommand:
+				// 群组聊天
+				logic.GroupChat(c.CommandMap, conn)
 			}
 		}
 	}()
@@ -318,6 +321,9 @@ func main() {
 					} else {
 						fmt.Printf("\b\b%s \n", ackPack.Data)
 					}
+				case constants.SendGroupMessageAckOpt:
+					// 群组聊天
+					fmt.Printf("\b\b%s \n", ackPack.Data)
 				}
 
 				fmt.Printf("\b\b~ ")

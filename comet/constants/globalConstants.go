@@ -52,6 +52,9 @@ const (
 
 	// 已加入的群组列表
 	GroupListOption = 116
+
+	// 群聊
+	GroupChatOption = 117
 )
 
 // 数据持久化协议指令
@@ -121,6 +124,9 @@ const (
 
 	// 已加入群组列表
 	GroupListAckOpt = 317
+
+	// 发送群组消息
+	SendGroupMessageAckOpt = 318
 )
 
 // 网络协议
@@ -145,6 +151,9 @@ const (
 
 	// 发送群组请求
 	SendGroupRequest = 505
+
+	// 发送群组消息
+	SendGroupMessage = 506
 )
 
 // 客户端命令
@@ -220,4 +229,7 @@ const (
 
 	// 已加入的群组列表
 	GroupListCommand = 624
+
+	// 群组聊天
+	GroupChatCommand = 625
 )

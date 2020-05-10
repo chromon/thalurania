@@ -121,3 +121,17 @@ CREATE TABLE `group_user`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COMMENT ='群组成员关系';
+
+/* 群组离线消息表 */
+DROP TABLE IF EXISTS `group_offline_message`;
+CREATE TABLE `group_offline_message`
+(
+  `id`          bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `user_id`     bigint(20) unsigned NOT NULL COMMENT '用户id',
+  `group_id`    bigint(20) unsigned NOT NULL COMMENT '组id',
+  `message_id`  bigint(20) unsigned NOT NULL COMMENT '消息 id',
+  PRIMARY KEY (`id`),
+  KEY `idx_app_id_user_id` (`user_id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COMMENT ='离线消息';

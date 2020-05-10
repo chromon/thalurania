@@ -68,6 +68,9 @@ func (uc *UserConsume) Consume() func(redis.Message) error {
 		case constants.SendGroupRequest:
 			// 向用户发送群组邀请
 			ackPack = packet.NewServerAckPack(constants.GroupRequestAckOpt, true, stp.Data)
+		case constants.SendGroupMessage:
+			// 群组聊天
+			ackPack = packet.NewServerAckPack(constants.SendGroupMessageAckOpt, true, stp.Data)
 		}
 
 		// 序列化 ack 并向客户端发送
